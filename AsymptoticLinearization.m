@@ -265,5 +265,5 @@ Map[Function[x,Apply[Plus, (Map[Take[FoldList[Plus,0,#],-1]&,
 End[]
 
 EndPackage[]
-Print["done reading asymptoticLinearization"]
+Print["done reading AsymptoticLinearization"]
 

@@ -109,17 +109,17 @@ modelPrep[mod_]:=
 With[{
 aModFunc = Apply[Function, 
 With[{vbls=eqnVars[mod],ll=lagLead[mod]},
-With[{argVal=Flatten[Table[Map[#[Global`t+i]&,vbls],{i,-ll[[1]],ll[[2]]}]]},
+With[{argVal=Flatten[Table[Map[#[t+i]&,vbls],{i,-ll[[1]],ll[[2]]}]]},
 With[{theSubs=Thread[argVal->Table[Unique[],{(ll[[2]]+ll[[1]]+1)*Length[vbls]}]]},
 {argVal/.theSubs,mod[[1]]/.theSubs}]]]]},
 With[{allVars=eqnVars[mod],ll=lagLead[mod]},
 With[{drvsModel=((Map[Function[x,Map[D[x,#]&,
   Flatten[Table[
-  Through[allVars[Global`t+i]],{i,-ll[[1]],ll[[2]]}]]]],(mod[[1]])]))},
+  Through[allVars[t+i]],{i,-ll[[1]],ll[[2]]}]]]],(mod[[1]])]))},
 With[{
 aModDrvFunc = Apply[Function, 
-With[{vbls=eqnVars[mod],ll=lagLead[mod]},
-With[{argVal=Flatten[Table[Map[#[Global`t+i]&,vbls],{i,-ll[[1]],ll[[2]]}]]},
+With[{vbls=eqnVars[mod]},
+With[{argVal=Flatten[Table[Map[#[t+i]&,vbls],{i,-ll[[1]],ll[[2]]}]]},
 With[{theSubs=Thread[argVal->Table[Unique[],{(ll[[2]]+ll[[1]]+1)*Length[vbls]}]]},
 {argVal/.theSubs,drvsModel/.theSubs}]]]]},
 {aModFunc,aModDrvFunc}]]]]
