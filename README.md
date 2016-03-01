@@ -1,1 +1,3 @@
 # stackStochSims
+
+An implementation of 
