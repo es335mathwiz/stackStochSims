@@ -3,6 +3,7 @@
 	<name>stachStochSimsProj</name>
 	<comment></comment>
 	<projects>
+		<project>ProtectedSymbols</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

@@ -1,8 +1,7 @@
 Resources[
     Version[1],
-    Java[
-        Directory["javaOutput"],
-        Directory["stackStochSimsProj/Java"]
+    Sources[
+        Directory["~"]
     ],
     ExecutionBuildCommand["<<stackStochSimsProj`"],
     Paclet[
