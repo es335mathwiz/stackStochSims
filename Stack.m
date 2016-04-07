@@ -1,6 +1,6 @@
 (* Wolfram Language Package *)
 
-BeginPackage["Stack`", { "AsymptoticLinearization`", "SymbolicAMA`"}]
+BeginPackage["Stack`", { "AsymptoticLinearization`", "SymbolicAMA`","ProtectedSymbols`"}]
 (* Exported symbols added here with SymbolName::usage *)  
 
 modelPrep::usage=
@@ -72,9 +72,9 @@ With[{maxLag=-Min[lagLead],maxLead=Max[lagLead]},
 
 
 nxtCDmats[{lags_,smats_,fvec_,cmats_,dmats_}]:=
-With[{seqns=Length[smats],scols=Length[smats[[1]]],
+With[{seqns=Length[smats],
 eqns=Length[cmats[[1]]]},
-With[{leads=(Length[smats[[1]]]/eqns) - 1-lags},
+With[{},
 With[{riffed=riffle[cmats[[Range[-lags,-1]]],
 dmats[[Range[-lags,-1]]],smats,fvec]},
 With[{
@@ -105,27 +105,17 @@ oneStepBack[{Append[yvec,
 
 
 
-modelPrep[mod_]:=
-With[{
-aModFunc = Apply[Function, 
-With[{vbls=eqnVars[mod],ll=lagLead[mod]},
+modelPrep[eqns_List]:=
+With[{vbls=eqnVars[eqns],ll=lagLead[eqns]},
 With[{argVal=Flatten[Table[Map[#[t+i]&,vbls],{i,-ll[[1]],ll[[2]]}]]},
 With[{theSubs=Thread[argVal->Table[Unique[],{(ll[[2]]+ll[[1]]+1)*Length[vbls]}]]},
-{argVal/.theSubs,mod[[1]]/.theSubs}]]]]},
-With[{allVars=eqnVars[mod],ll=lagLead[mod]},
-With[{drvsModel=((Map[Function[x,Map[D[x,#]&,
-  Flatten[Table[
-  Through[allVars[t+i]],{i,-ll[[1]],ll[[2]]}]]]],(mod[[1]])]))},
-With[{
-aModDrvFunc = Apply[Function, 
-With[{vbls=eqnVars[mod]},
-With[{argVal=Flatten[Table[Map[#[t+i]&,vbls],{i,-ll[[1]],ll[[2]]}]]},
-With[{theSubs=Thread[argVal->Table[Unique[],{(ll[[2]]+ll[[1]]+1)*Length[vbls]}]]},
-{argVal/.theSubs,drvsModel/.theSubs}]]]]},
-{aModFunc,aModDrvFunc}]]]]
+With[{drvsModel=Map[Function[xx,Map[D[xx,#]&,argVal]],eqns]},
+With[{aModDrvFunc = Function @@ ({argVal,drvsModel}/.theSubs)},
+{aModDrvFunc}]]]]]
 
 
-
+(*{argVal/.theSubs,mod[[1]]/.theSubs}]]]]},
+With[{aModFunc = Apply[Function, *)
 
 nxtGuess[nlag_,theFunc_,theDrvFunc_,termConstr_,fp_,guess_]:=
 With[{neq=Length[theDrvFunc[[2]]]},
@@ -136,7 +126,7 @@ theZeroMatsC=Table[ZeroMatrix[neq,neq],{nlag}],
 theZeroMatsD=Table[ZeroMatrix[neq,1],{nlag}]
 },
 With[{theArgs=Partition[guess,appDim,neq]},
-With[{theRes=Map[Apply[theFunc,#]& , theArgs]},
+With[{},
 {nxlstC,nxlstD}=Fold[Function[{x,y},nxtCDmats[{nlag,
 Apply[theDrvFunc,y],
 Apply[theFunc,y],x[[1]],x[[2]]}]],
@@ -159,7 +149,7 @@ theIdentMatsC=Table[-IdentityMatrix[neq],{nlag}],
 theZeroMatsD=Table[ZeroMatrix[neq,1],{nlag}]
 },
 With[{theArgs=Partition[guess,appDim,neq]},
-With[{theRes=Map[Apply[theFunc,#]& , theArgs]},
+With[{},
 {nxlstC,nxlstD}=Fold[Function[{x,y},nxtCDmats[{nlag,
 Apply[theDrvFunc,y],
 Apply[theFunc,y],x[[1]],x[[2]]}]],

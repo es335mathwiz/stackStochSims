@@ -52,7 +52,7 @@ MapIndexed[("#define " <>
 modelDefaultParameterSubs[modelEquations_]:=Thread[coeffs[modelEquations]->modelDefaultParameters[modelEquations]];
 
 coeffAssn[modelEquations_]:=
-With[{coeffs=coeffs[modelEquations],ll=lagsLeads[modelEquations]},
+With[{coeffs=coeffs[modelEquations]},
 MapIndexed[("#define " <> 
  ToString[#] <> " (parameters["<> ToString[#2[[1]]-1] <> "])\n")&,coeffs]];
 
@@ -121,8 +121,7 @@ exogIn[modEq_,sys_List]:=With[{endg=endog[modEq]},Intersection[endg,modelExogeno
 
 prenewspdrv[modelEquations_]:=
 With[{(*exg=modelExogenous[modelEquations]*)exg={}},
-With[{allv=allVars[modelEquations],
-modeq=modelEquations/.funcSubs},
+With[{allv=allVars[modelEquations]},
 With[{endg=Select[allv,(And @@ (Function[x,FreeQ[#,x]] /@ exg))&]},
 With[{forOne=Function[x,
 With[{relevant=Select[endg,Not[FreeQ[x,#]]&]},Print["just after defining relevant"];
@@ -131,8 +130,7 @@ forOne/@modelEquations]]]]
 
 notPrenewspdrv[modelEquations_]:=
 With[{endg=justEndog[modelEquations]},
-With[{allv=allVars[modelUpsilonEqns[modelEquations]],
-modeq=modelEquations/.funcSubs},
+With[{allv=allVars[modelUpsilonEqns[modelEquations]]},
 With[{exg=Select[allv,(And @@ (Function[x,FreeQ[#,x]] /@ endg))&]},
 With[{forOne=Function[x,
 With[{relevant=Select[exg,Not[FreeQ[x,#]]&]},Print["just after defining relevant"];
@@ -195,8 +193,7 @@ With[{lens=Length/@res},Append[Transpose[Partition[Flatten[res],2]],1+FoldList[P
 
 wrtExogPrenewspdrv[modelEquations_]:=
 With[{exg=modelExogenous[modelEquations]},
-With[{allv=allVars[modelEquations],
-modeq=modelEquations/.funcSubs},
+With[{allv=allVars[modelEquations]},
 With[{endg=Select[allv,(Or @@ (Function[x,!FreeQ[#,x]] /@ exg))&]},
 With[{forOne=Function[x,
 With[{relevant=Select[endg,Not[FreeQ[x,#]]&]},Print["just after defining relevant"];
@@ -323,7 +320,7 @@ spa),{}])))//.sumSameIJ]
 trySeries[modelEquation_]:=
 With[{allv=allVars[modelEquation]},
 With[{linv=({#,ToExpression["linPt$" <>ToString[#]],1}& /@allv)},
-With[{forSub= Thread[allv->linv]},
+With[{},
 Normal[Series @@ Join[{(modelEquation)},linv]]]]];
 
 

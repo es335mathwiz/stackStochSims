@@ -4,6 +4,7 @@
 	<comment></comment>
 	<projects>
 		<project>ProtectedSymbols</project>
+		<project>SymbolicAMA</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
