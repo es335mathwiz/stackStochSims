@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>stachStochSimsProj</name>
+	<name>stackStochSimsProj</name>
 	<comment></comment>
 	<projects>
 		<project>ProtectedSymbolsProject</project>
+		<project>SymbolicAMA</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

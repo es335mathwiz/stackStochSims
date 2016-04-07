@@ -35,13 +35,14 @@ denseToSparseMat::usage=
 nxtGuess::usage=
 "nxtGuess[lags_,theFunc_,theDrvFunc_,termConstr_,fp_]"
 
-Global`t::usage=
-"time t, if this appears in a function arg, 
-then stack treats that functions name as  a variable name"
+
+denseColToSparseMat::usage="denseColToSparseMat[vec_List]"
+
+Begin["Private`"]
 
 
-Begin["private`"]
-
+denseColToSparseMat[vec_List]:=
+{vec,Table[1,{Length[vec]}],Range[Length[vec]+1]}
 
 
 
@@ -51,38 +52,39 @@ With[{cmatNow=cmatList[[1]],cmatRest=Rest[cmatList],
 dmatNow=dmatList[[1]],dmatRest=Rest[dmatList]},
 With[{seqns=Length[smat],
 eqns=Length[cmatNow],scols=Length[smat[[1]]],ccols=Length[cmatNow[[1]]]},
-With[{expand=BlockMatrix[{{cmatList[[1]],
-      ZeroMatrix[eqns,scols-ccols-eqns]}}],
-smatSub=SubMatrix[smat,{1,1},{seqns,eqns}] },
-Apply[riffle,{cmatRest,dmatRest,SubMatrix[smat,{1,eqns+1},{seqns,scols-eqns}] -
+With[{expand=blockMatrix[{{cmatList[[1]],
+      zeroMatrix[eqns,scols-ccols-eqns]}}],
+smatSub=subMatrix[smat,{1,1},{seqns,eqns}] },
+Apply[riffle,{cmatRest,dmatRest,subMatrix[smat,{1,eqns+1},{seqns,scols-eqns}] -
   smatSub. expand,fvec - smatSub . dmatNow}]]]]]
 
 
 
 eqnVars[eqns_]:=Union[Cases[
-eqns,x_[Global`t]->x,Infinity],Cases[eqns,x_[Global`t+_]->x,Infinity]]
+eqns,x_[t]->x,Infinity],Cases[eqns,x_[t+_]->x,Infinity]]
 
 
 
 lagLead[eqns_]:=
-With[{lagLead=Union[Cases[eqns,_[Global`t]->0,{Infinity}],Cases[eqns,_[Global`t+x_]->x,Infinity]]},
+With[{lagLead=Union[Cases[eqns,_[t]->0,{Infinity}],Cases[eqns,_[t+x_]->x,Infinity]]},
 With[{maxLag=-Min[lagLead],maxLead=Max[lagLead]},
 {maxLag,maxLead}]]
 
 
 
 nxtCDmats[{lags_,smats_,fvec_,cmats_,dmats_}]:=
-With[{seqns=Length[smats],scols=Length[smats[[1]]],
+With[{seqns=Length[smats],
 eqns=Length[cmats[[1]]]},
-With[{leads=(Length[smats[[1]]]/eqns) - 1-lags},
+With[{},
 With[{riffed=riffle[cmats[[Range[-lags,-1]]],
 dmats[[Range[-lags,-1]]],smats,fvec]},
 With[{
 hlu=
-  LUDecomposition[SubMatrix[riffed[[1]],{1,1},{seqns,seqns}]]
+  LUDecomposition[subMatrix[riffed[[1]],{1,1},{seqns,seqns}]],
+  theSubMat=subMatrix[riffed[[1]],{1,seqns+1},
+  {seqns,eqns}]
 },
-{Append[cmats,LUBackSubstitution[hlu,SubMatrix[riffed[[1]],{1,seqns+1},
-  {seqns,eqns}]]],
+{Append[cmats,LUBackSubstitution[hlu,theSubMat]],
 Append[dmats,LUBackSubstitution[hlu,riffed[[2]]]]}]]]]
 
 
@@ -110,8 +112,10 @@ With[{vbls=eqnVars[eqns],ll=lagLead[eqns]},
 With[{argVal=Flatten[Table[Map[#[t+i]&,vbls],{i,-ll[[1]],ll[[2]]}]]},
 With[{theSubs=Thread[argVal->Table[Unique[],{(ll[[2]]+ll[[1]]+1)*Length[vbls]}]]},
 With[{drvsModel=Map[Function[xx,Map[D[xx,#]&,argVal]],eqns]},
-With[{aModDrvFunc = Function @@ ({argVal,drvsModel}/.theSubs)},
-{aModDrvFunc}]]]]]
+With[{aModFunc=Function @@ ({argVal,eqns}/.theSubs)},
+	With[{
+	aModDrvFunc = Function @@ ({argVal,drvsModel}/.theSubs)},
+{aModFunc,aModDrvFunc}]]]]]]
 
 
 (*{argVal/.theSubs,mod[[1]]/.theSubs}]]]]},
@@ -122,17 +126,17 @@ With[{neq=Length[theDrvFunc[[2]]]},
 With[{nlead=(Length[theDrvFunc[[2,1]]]/neq)-nlag-1},
 Module[{nxlstC,nxlstD,lstC,lstD},
 With[{appDim=(nlag+nlead+1)*neq,
-theZeroMatsC=Table[ZeroMatrix[neq,neq],{nlag}],
-theZeroMatsD=Table[ZeroMatrix[neq,1],{nlag}]
+theZeroMatsC=Table[zeroMatrix[neq,neq],{nlag}],
+theZeroMatsD=Table[zeroMatrix[neq,1],{nlag}]
 },
 With[{theArgs=Partition[guess,appDim,neq]},
-With[{theRes=Map[Apply[theFunc,#]& , theArgs]},
+With[{},
 {nxlstC,nxlstD}=Fold[Function[{x,y},nxtCDmats[{nlag,
 Apply[theDrvFunc,y],
 Apply[theFunc,y],x[[1]],x[[2]]}]],
 {theZeroMatsC,theZeroMatsD},theArgs];
 {lstC,lstD}=nxtCDmats[{nlag,
-BlockMatrix[{{termConstr,ZeroMatrix[Length[termConstr],neq]}}],
+blockMatrix[{{termConstr,zeroMatrix[Length[termConstr],neq]}}],
 termConstr . (Transpose[{guess[[Range[-neq*(nlag+nlead),-1]]]}]- 
 Transpose[{fp[[Range[-neq*(nlag+nlead),-1]]]}]),nxlstC,nxlstD}];
 bs=backSub[lstC,lstD];
@@ -146,19 +150,19 @@ With[{nlead=(Length[theDrvFunc[[2,1]]]/neq)-nlag-1},
 Module[{nxlstC,nxlstD,lstC,lstD},
 With[{appDim=(nlag+nlead+1)*neq,
 theIdentMatsC=Table[-IdentityMatrix[neq],{nlag}],
-theZeroMatsD=Table[ZeroMatrix[neq,1],{nlag}]
+theZeroMatsD=Table[zeroMatrix[neq,1],{nlag}]
 },
 With[{theArgs=Partition[guess,appDim,neq]},
-With[{theRes=Map[Apply[theFunc,#]& , theArgs]},
+With[{},
 {nxlstC,nxlstD}=Fold[Function[{x,y},nxtCDmats[{nlag,
 Apply[theDrvFunc,y],
 Apply[theFunc,y],x[[1]],x[[2]]}]],
 {theIdentMatsC,theZeroMatsD},theArgs];
 With[{nstFunc=Function[x,
 nxtCDmats[{nlag,
-BlockMatrix[{{ZeroMatrix[neq,neq*(nlag-1)],
-IdentityMatrix[neq],-IdentityMatrix[neq],ZeroMatrix[neq,neq*(nlead)]}}],
-ZeroMatrix[neq,1],x[[1]],x[[2]]}]]},
+blockMatrix[{{zeroMatrix[neq,neq*(nlag-1)],
+IdentityMatrix[neq],-IdentityMatrix[neq],zeroMatrix[neq,neq*(nlead)]}}],
+zeroMatrix[neq,1],x[[1]],x[[2]]}]]},
 {lstC,lstD}=Nest[nstFunc,{nxlstC,nxlstD},nlead]];
 bs=backSub[lstC,lstD];
 guess-Flatten[bs]]]]]]]

@@ -1,6 +1,6 @@
 (* Wolfram Language Package *)
 
-BeginPackage["AsymptoticLinearization`"]
+BeginPackage["AsymptoticLinearization`",{"ProtectedSymbols`"}]
 (* Exported symbols added here with SymbolName::usage *)  
 
 (* 
@@ -181,7 +181,7 @@ With[{ll=Join[Cases[eqns,_[t_]->0,Infinity],Cases[eqns,_[t+x_]->x,Infinity]]},
 almodelFunc[func_]:=
 Module[{},
 With[{fn=func //. t -> $timeMarker},
-With[{vars=Union[(Map[Head  Union[Map[(Apply[Part , Prepend[#,fn]]) & ,
+With[{vars=Union[(Map[Head,  Union[Map[(Apply[Part , Prepend[#,fn]]) & ,
         Position[fn,x_[$timeMarker]]]]]),
 (Map[Head , Union[Map[(Apply[Part , Prepend[#,fn]]) & ,
         Position[fn,x_[$timeMarker + y_]]]]])]},
@@ -192,7 +192,7 @@ With[{mathematicaFuncList={Sqrt,Exp,Log,Sin,Cos,Tan,Csc,Sec,Cot,ArcSin,
                 Sqrt,Derivative,D,Integrate,Head[func],
                     $timeMarker}},
 With[{params=Complement[Union[
-    Map[(Apply[Part , Prepend[#,fn]]) &  Position[fn,x_Symbol]]],
+    Map[(Apply[Part , Prepend[#,fn]]) &,  Position[fn,x_Symbol]]],
         mathematicaFuncList,vars]},
 Apply[Function , {params, Apply[Function , {t,func[[1]]}]}]]]]]]
 
@@ -233,8 +233,7 @@ With[{ssSubs=sStates/.$steadyStateT->Blank[],
                 {tSpec, tSpec + _}]]]] - tSpec},
 With[{tRange=Prepend[{Min[tAppearing],Max[tAppearing]},tVal]},
 With[{vblsPresent=Flatten[Map[Table[#[tSpec+tVal],tRange]& , vars]]},
-With[{varSubs=Thread[#1->#2&[vblsPresent,Unique[Map[(ToString[#[[0]]])&,
-                 vblsPresent]]]]},
+With[{},
 With[{sslin= Part[Map[Function[ss,
 Apply[Function , {params,
         CoefficientList[

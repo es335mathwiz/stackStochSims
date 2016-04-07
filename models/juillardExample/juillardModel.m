@@ -7,7 +7,7 @@ juillardModel={
 ey[t],
 pdot[t]  - (0.414 pdot[t+1] + (1 - 0.414)* 
 		 pdot[t-1] + 0.196 (g^2/(g-y[t]) - g) + 
-		 0.276(g^2/(g - y[t-1]) - g)) + eps *pdot[t+5] ,
+		 0.276(g^2/(g - y[t-1]) - g)) + eps *pdot[t+1] ,
 rr[t]- (rs[t] - 0.414 pdot[t+1] - (1-0.414)pdot[t-1]),
 rs[t] - (3 pdot[t]+ y[t]),
 y[t] - (0.304 y[t-1] - 0.98 rr[t] - 0.315 rr[t-1] - ey[t-1])

@@ -2,7 +2,7 @@
 
 (* Created by the Wolfram Workbench Mar 1, 2016 *)
 
-BeginPackage["stackStochSimsProj`", {"JLink`"}]
+BeginPackage["stackStochSimsProj`", {"JLink`","Stack`"}]
 (* Exported symbols added here with SymbolName::usage *) 
 
 Begin["`Private`"]
