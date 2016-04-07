@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>stackStochSimsProj</name>
+	<name>stachStochSimsProj</name>
 	<comment></comment>
 	<projects>
-		<project>ProtectedSymbolsProject</project>
+		<project>ProtectedSymbols</project>
 		<project>SymbolicAMA</project>
 	</projects>
 	<buildSpec>
@@ -23,3 +23,4 @@
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
 </projectDescription>
+

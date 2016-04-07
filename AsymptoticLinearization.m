@@ -181,7 +181,7 @@ With[{ll=Join[Cases[eqns,_[t_]->0,Infinity],Cases[eqns,_[t+x_]->x,Infinity]]},
 almodelFunc[func_]:=
 Module[{},
 With[{fn=func //. t -> $timeMarker},
-With[{vars=Union[(Map[Head,  Union[Map[(Apply[Part , Prepend[#,fn]]) & ,
+With[{vars=Union[(Map[Head,Union[Map[(Apply[Part , Prepend[#,fn]]) & ,
         Position[fn,x_[$timeMarker]]]]]),
 (Map[Head , Union[Map[(Apply[Part , Prepend[#,fn]]) & ,
         Position[fn,x_[$timeMarker + y_]]]]])]},
@@ -192,7 +192,11 @@ With[{mathematicaFuncList={Sqrt,Exp,Log,Sin,Cos,Tan,Csc,Sec,Cot,ArcSin,
                 Sqrt,Derivative,D,Integrate,Head[func],
                     $timeMarker}},
 With[{params=Complement[Union[
+<<<<<<< HEAD
     Map[(Apply[Part , Prepend[#,fn]]) &,  Position[fn,x_Symbol]]],
+=======
+    Map[(Apply[Part , Prepend[#,fn]]) & ,Position[fn,x_Symbol]]],
+>>>>>>> 7a55dfc07de3a2f3a62f506b84ef9efe24fc55d9
         mathematicaFuncList,vars]},
 Apply[Function , {params, Apply[Function , {t,func[[1]]}]}]]]]]]
 
