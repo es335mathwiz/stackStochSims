@@ -192,11 +192,7 @@ With[{mathematicaFuncList={Sqrt,Exp,Log,Sin,Cos,Tan,Csc,Sec,Cot,ArcSin,
                 Sqrt,Derivative,D,Integrate,Head[func],
                     $timeMarker}},
 With[{params=Complement[Union[
-<<<<<<< HEAD
-    Map[(Apply[Part , Prepend[#,fn]]) &,  Position[fn,x_Symbol]]],
-=======
     Map[(Apply[Part , Prepend[#,fn]]) & ,Position[fn,x_Symbol]]],
->>>>>>> 7a55dfc07de3a2f3a62f506b84ef9efe24fc55d9
         mathematicaFuncList,vars]},
 Apply[Function , {params, Apply[Function , {t,func[[1]]}]}]]]]]]
 

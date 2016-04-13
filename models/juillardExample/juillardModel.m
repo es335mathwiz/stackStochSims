@@ -2,6 +2,7 @@
 Needs["Statistics`ContinuousDistributions`"]
 Needs["Statistics`MultinormalDistribution`"]
 *)
+(*linear model one lag one lead*)
 julSubs={eps->0,g->0.049};stochSubs={eps->0.5,g->0.6};
 juillardModel={
 ey[t],
@@ -30,6 +31,6 @@ Print["solving  sseqns for ey,pdot,rr,rs,y"];
 juillardEqns=Thread[(juillardModel)==0];
 sseqns=Simplify[juillardEqns/.
   {ey[_]->ey,pdot[_]->pdot,rr[_]->rr,rs[_]->rs,y[_]->y}];
-some=(Solve[sseqns,{ey,pdot,rr,rs,y}][[2]]//Simplify);
-
+{lsome,some}=(Solve[sseqns,{ey,pdot,rr,rs,y}]//Simplify);
+rsome=(Reduce[sseqns,{ey,pdot,rr,rs,y}]//Simplify);
 modelFpGuess[juillardModel]=({ey,pdot,rr,rs,y}/.some);
