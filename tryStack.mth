@@ -1,0 +1,47 @@
+PrependTo[$Path, 
+  "../ProjectionMethodTools/ProjectionMethodToolsJava/code/"];
+PrependTo[$Path, 
+  "../AMASeriesRepresentation/AMASeriesRepresentation/"];
+
+PrependTo[$Path, 
+  "../ProtectedSymbols/"];
+PrependTo[$Path, 
+  "../mathAMA/NumericAMA"];
+PrependTo[$Path, 
+  "../mathAMA/SymbolicAMA"];
+PrependTo[$Path, 
+  "../mathAMA/AMAModel"];
+
+Needs["simpleRBCModel`"]
+Needs["Stack`"]
+
+{jModF, jModDF} = 
+  modelPrep[(rbcEqns /. eps[theta][t] -> 0) //. simpParamSubs // myN];
+fpCondMat = 
+ blockMatrix[{{0*
+     IdentityMatrix[3], -IdentityMatrix[3]}}]; fpVal = {cc, kk, theta,
+     cc, kk, theta} /. (ssSolnSubsPF //. simpParamSubs) // N
+
+initX = Table[Random[], {3}] + fpVal[[Range[3]]]; initPath = 
+ Table[0.001*Random[], {3*100}] + Flatten[Table[fpVal, {50}]];
+
+jPath[len_Integer] :=
+ With[{bip = initPath[[Range[3*len]]]}, 
+  Nest[nxtGuess[1, jModF, jModDF, fpCondMat, fpVal, #] &, 
+    Join[initX, bip], 20][[3 +
+     Range[3]]]];
+
+jPathAMA[len_Integer] :=
+ With[{bip = initPath[[Range[3*len]]]}, 
+  Nest[nxtGuess[1, jModF, jModDF, Private`qmatSymbRE // N, 
+      fpVal, #] &, Join[initX, bip], 20][[3 +
+     Range[3]]]];
+jPathFull[len_Integer] :=
+ With[{bip = initPath[[Range[3*len]]]}, 
+  Nest[nxtGuess[1, jModF, jModDF, fpCondMat, fpVal, #] &, 
+   Join[initX, bip], 20]];
+
+jPathAMAFull[len_Integer] :=
+ With[{bip = initPath[[Range[3*len]]]}, 
+  Nest[nxtGuess[1, jModF, jModDF, Private`qmatSymbRE // N, 
+     fpVal, #] &, Join[initX, bip], 20]];
