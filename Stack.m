@@ -121,7 +121,7 @@ With[{aModFunc=Function @@ ({argVal,eqns}/.theSubs)},
 (*{argVal/.theSubs,mod[[1]]/.theSubs}]]]]},
 With[{aModFunc = Apply[Function, *)
 
-nxtGuess[nlag_,theFunc_,theDrvFunc_,termConstr_,fp_,guess_]:=
+nxtGuess[nlag_Integer,theFunc_Function,theDrvFunc_Function,termConstr_?MatrixQ,fp_?VectorQ,guess_?VectorQ]:=
 With[{neq=Length[theDrvFunc[[2]]]},
 With[{nlead=(Length[theDrvFunc[[2,1]]]/neq)-nlag-1},
 Module[{nxlstC,nxlstD,lstC,lstD},

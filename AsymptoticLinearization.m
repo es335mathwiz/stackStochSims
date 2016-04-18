@@ -255,11 +255,15 @@ With[{further=
         Map[{#,Select[Position[y,#],Length[#]==dpth&]}& , x]],
         {vals,coeffLists}]},
 Apply[Function , {params,
-Apply[AppendColumns ,
+ArrayFlatten@ Transpose @{
 (Map[If[Head[#]==Integer,zeroRow,#,#]& ,
 Map[Function[x,Apply[Plus, (Map[Take[FoldList[Plus,0,#],-1]&,
-        (Map[(#[[2]]/.{1->0,2->#[[1]]})& , x])])]],further]])]}]
+        (Map[(#[[2]]/.{1->0,2->#[[1]]})& , x])])]],further]])}}
+        ]
 ]]]]]]]]]]]]]]]]]
+
+(*
+ArrayFlatten[Transpose[{{#}}]]&*)
 
 End[]
 
