@@ -14,6 +14,7 @@ PrependTo[$Path,
 
 Needs["simpleRBCModel`"]
 Needs["Stack`"]
+Needs["Stoch`"]
 
 {jModF, jModDF} = 
   modelPrep[(rbcEqns /. eps[theta][t] -> 0) //. simpParamSubs // myN];
