@@ -1,0 +1,92 @@
+PrependTo[$Path, 
+  "../ProjectionMethodTools/ProjectionMethodToolsJava/code/"];
+PrependTo[$Path, 
+  "../AMASeriesRepresentation/AMASeriesRepresentation/"];
+
+PrependTo[$Path, 
+  "../ProtectedSymbols/"];
+PrependTo[$Path, 
+  "../mathAMA/NumericAMA"];
+PrependTo[$Path, 
+  "../mathAMA/SymbolicAMA"];
+PrependTo[$Path, 
+  "../mathAMA/AMAModel"];
+
+Needs["simpleRBCModel`"]
+Needs["Stack`"]
+Needs["Stoch`"]
+
+
+julMod = aMod[{ey[t], 
+     pdot[t] - (0.414 pdot[t + 1] + (1 - 0.414)*pdot[t - 1] + 
+        0.196 (g^2/(g - y[t]) - g) + 0.276 (g^2/(g - y[t - 1]) - g)), 
+     rr[t] - (rs[t] - 0.414 pdot[t + 1] - (1 - 0.414) pdot[t - 1]), 
+     rs[t] - (3 pdot[t] + y[t]), 
+     y[t] - (0.304 y[t - 1] - 0.98 rr[t] - 0.315 rr[t - 1] - 
+        ey[t - 1])} /. g -> 0.049];
+
+testModel =.;
+lags[testModel] = 1;
+leads[testModel] = 1;
+eqns[testModel] = 5;
+
+<< rayMemoShocks0531.m;
+shocks[testModel] = shk;
+
+xData[testModel] = 
+  Transpose[{Range[-0.3, 0.4, 0.01], Range[-0.6, 0.1, 0.01], 
+    Range[-0.3, 0.4, 0.01], Range[-0.6, 0.1, 0.01], 
+    Range[-0.3, 0.4, 0.01]}];
+
+
+
+paperFunc = 
+  Apply[Function, 
+   With[{vbls = eqnVars[julMod], ll = lagLead[julMod]}, 
+    With[{argVal = 
+       Flatten[Table[Map[#[t + i] &, vbls], {i, -ll[[1]], ll[[2]]}]]},
+      With[{theSubs = 
+        Thread[argVal -> Table[Unique[], {15}]]}, {argVal /. theSubs, 
+       julMod[[1]] /. theSubs}]]]];
+
+func[testModel] = paperFunc;
+
+
+With[{allVars = eqnVars[julMod], ll = lagLead[julMod]}, 
+  drvsModel = ((Map[
+      Function[x, 
+       Map[D[x, #] &, 
+        Flatten[Table[
+          Through[allVars[t + i]], {i, -ll[[1]], 
+           ll[[2]]}]]]], (julMod[[1]])]))];
+
+
+paperDrvFunc = 
+  Apply[Function, 
+   With[{vbls = eqnVars[julMod], ll = lagLead[julMod]}, 
+    With[{argVal = 
+       Flatten[Table[Map[#[t + i] &, vbls], {i, -ll[[1]], ll[[2]]}]]},
+      With[{theSubs = 
+        Thread[argVal -> Table[Unique[], {15}]]}, {argVal /. theSubs, 
+       drvsModel /. theSubs}]]]];
+
+drvFunc[testModel] = paperDrvFunc;
+
+{pvbls, pssFuncs} = steadyState[julMod];
+pres = ssLinearizeAndMakeHMat[julMod, pssFuncs[[1]]];
+{{af, ar}, {ab, rar}} = symbolicBiDirectionalAR[pres[]];
+transMat = symbolicTransitionMatrix[ar];
+
+{ubigvals, ubigEvs} = Eigensystem[Transpose[transMat]];
+qmat = Join[af, ubigEvs[[{1}]]];
+qMat[testModel] = qmat;
+fp[testModel] = Table[0, {5*3}];
+
+paperQ = blockMatrix[{{qmat, zeroMatrix[5]}}];
+
+
+
+shk = shocks[testModel];
+
+Timing[tryStochT = stochSim[2, 10, 30, testModel, 1, t]];
+tryStochT[[1]] // Chop
