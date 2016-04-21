@@ -1,0 +1,361 @@
+\setcounter{MaxMatrixCols}{15}
+\newcommand{\imag}{{i}}
+%<*varsPlugged=Flatten[Table[Subscript[#,t+i]& /@ eqnVars[paperModel],{i,-1,1}]];*>
+%<*eqnsPlugged=paperFunc @@ varsPlugged;*>
+
+\section{Test Model Definition}
+\label{sec:testmodel}
+
+
+
+\begin{multline*}
+f(<*    varsPlugged[[1]]*>,
+<*    varsPlugged[[2]]*>,
+<*    varsPlugged[[3]]*>,
+<*    varsPlugged[[4]]*>,
+<*    varsPlugged[[5]]*>,
+<*    varsPlugged[[6]]*>,
+<*    varsPlugged[[7]]*>,
+<*    varsPlugged[[8]]*>,
+<*    varsPlugged[[9]]*>,
+<*    varsPlugged[[10]]*>,
+<*    varsPlugged[[11]]*>,
+<*    varsPlugged[[12]]*>,
+<*    varsPlugged[[13]]*>,
+<*    varsPlugged[[14]]*>,
+<*    varsPlugged[[15]]*>)=\\
+  \begin{bmatrix}
+<*    eqnsPlugged[[1]]*>\\
+<*    eqnsPlugged[[2]]*>\\
+<*    eqnsPlugged[[3]]*>\\
+<*    eqnsPlugged[[4]]*>\\
+<*    eqnsPlugged[[5]]*>
+  \end{bmatrix}
+\end{multline*}
+The origin is a fixed point for this model. At the origin, the linearized
+dynamic system has four non-zero eigenvalues
+\begin{gather*}
+  \begin{bmatrix}
+<*matrixRowToAmsForm[ubigvals,1,4]*>
+  \end{bmatrix}
+\end{gather*}
+The Anderson-Moore algorithm combines 4 auxiliary initial conditions with
+the one left eigenvector associated with the root that has magnitude 
+greater than one to produce the linear asymptotic constraint matrix
+\begin{gather*}
+Q=  
+\begin{bmatrix}
+<*matrixRowToAmsForm[qmat[[1]],1,10]*>\\
+<*matrixRowToAmsForm[qmat[[2]],1,10]*>\\
+<*matrixRowToAmsForm[qmat[[3]],1,10]*>\\
+<*matrixRowToAmsForm[qmat[[4]],1,10]*>\\
+<*matrixRowToAmsForm[qmat[[5]],1,10]*>
+\end{bmatrix}
+\end{gather*}
+
+\section{Shock Values}
+\label{sec:shocks}
+
+\begin{gather*}
+\Upsilon=\begin{bmatrix}
+<*matrixRowToAmsForm[shk[[1]],1,5]*>\\
+<*matrixRowToAmsForm[shk[[2]],1,5]*>\\
+<*matrixRowToAmsForm[shk[[3]],1,5]*>\\
+<*matrixRowToAmsForm[shk[[4]],1,5]*>\\
+<*matrixRowToAmsForm[shk[[5]],1,5]*>\\
+<*matrixRowToAmsForm[shk[[6]],1,5]*>\\
+<*matrixRowToAmsForm[shk[[7]],1,5]*>\\
+<*matrixRowToAmsForm[shk[[8]],1,5]*>\\
+<*matrixRowToAmsForm[shk[[9]],1,5]*>\\
+<*matrixRowToAmsForm[shk[[10]],1,5]*>\\
+<*matrixRowToAmsForm[shk[[11]],1,5]*>\\
+<*matrixRowToAmsForm[shk[[12]],1,5]*>\\
+<*matrixRowToAmsForm[shk[[13]],1,5]*>\\
+<*matrixRowToAmsForm[shk[[14]],1,5]*>\\
+<*matrixRowToAmsForm[shk[[15]],1,5]*>\\
+<*matrixRowToAmsForm[shk[[16]],1,5]*>\\
+<*matrixRowToAmsForm[shk[[17]],1,5]*>\\
+<*matrixRowToAmsForm[shk[[18]],1,5]*>\\
+<*matrixRowToAmsForm[shk[[19]],1,5]*>\\
+<*matrixRowToAmsForm[shk[[20]],1,5]*>\\
+<*matrixRowToAmsForm[shk[[21]],1,5]*>\\
+<*matrixRowToAmsForm[shk[[22]],1,5]*>\\
+<*matrixRowToAmsForm[shk[[23]],1,5]*>\\
+<*matrixRowToAmsForm[shk[[24]],1,5]*>\\
+<*matrixRowToAmsForm[shk[[25]],1,5]*>\\
+<*matrixRowToAmsForm[shk[[26]],1,5]*>\\
+<*matrixRowToAmsForm[shk[[27]],1,5]*>\\
+<*matrixRowToAmsForm[shk[[28]],1,5]*>\\
+<*matrixRowToAmsForm[shk[[29]],1,5]*>\\
+<*matrixRowToAmsForm[shk[[30]],1,5]*>\\
+\end{bmatrix}
+\end{gather*}
+
+
+\section{Test Model Computation}
+\label{sec:testComp}
+
+
+%<*(*Print["computing t path"];timeTEx02=generatePathX[{testModel,30,t,Table[{0,0,0,0,0},{1}]},{1,15,6}];*)*>
+%<*Print["for test computing t path"];timeTEx02=generatePathX[{testModel,1,t,Table[{0,0,0,0,0},{1}]},{1,15,6}];*>
+Starting from the origin and using shocks 1, 15 and 6 in that order produces\footnote{These computations employ an excessively long, 30 period  ``stack length''
+in order to guarantee the each
+solution constitutes a perfect foresight path for the nonlinear model.}
+\begin{gather*}
+E_{t}(x_0)=  \begin{bmatrix}
+<*matrixRowToAmsForm[timeTEx02[[1,2]],1,5]*>    
+  \end{bmatrix}\\
+E_{t}(x_1)=  \begin{bmatrix}
+<*matrixRowToAmsForm[timeTEx02[[1,3]],1,5]*>    
+  \end{bmatrix}\\
+E_{t}(x_2)=  \begin{bmatrix}
+<*matrixRowToAmsForm[timeTEx02[[1,4]],1,5]*>    
+  \end{bmatrix}\\
+\intertext{ and }
+%<*(*Print["computing t-1 path"];timeTMinusOneEx02=generatePathX[{testModel,30,tMinusOne,Table[{0,0,0,0,0},{1}]},{1,15,6}];*)*>
+%<*Print["for test computing t-1 path"];timeTMinusOneEx02=generatePathX[{testModel,1,tMinusOne,Table[{0,0,0,0,0},{1}]},{1,15,6}];*>
+E_{t-1}(x_0)=  \begin{bmatrix}
+<*matrixRowToAmsForm[timeTMinusOneEx02[[1,2]],1,5]*>    
+  \end{bmatrix}\\
+E_{t-1}(x_1)=  \begin{bmatrix}
+<*matrixRowToAmsForm[timeTMinusOneEx02[[1,3]],1,5]*>    
+  \end{bmatrix}\\
+E_{t-1}(x_2)=  \begin{bmatrix}
+<*matrixRowToAmsForm[timeTMinusOneEx02[[1,4]],1,5]*>    
+  \end{bmatrix}
+\end{gather*}
+
+A stochastic simulation consists of repeatedly drawing a sequence of shocks
+to produce paths like the ones above.
+
+
+
+\section{Test Model Verification}
+\label{sec:testVerify}
+
+
+To verify the solutions are correct, evaluate $f(x)$ along the path
+with relevant perfect foresight values.
+
+%<*plugArgTM101=Join[{0,0,0,0,0},timeTMinusOneEx02[[1,2]],{0,0,0,0,0}];*>
+%<*plugTM101= paperFunc @@ plugArgTM101;*>
+For ``t-1 expectations'', initially we have 
+\begin{gather*}
+  x_{-1}=E_{t-1}(x_{0})=E_{t-1}(x_{1})=0
+\end{gather*}
+{so that}  
+\begin{multline*}
+\epsilon=f(
+\setcounter{MaxMatrixCols}{15}
+\begin{matrix}
+<*matrixRowToAmsForm[plugArgTM101,1,7]*>
+\end{matrix}\\
+\begin{matrix}
+<*matrixRowToAmsForm[plugArgTM101,8,15]*>
+\end{matrix})=\\
+\begin{bmatrix}
+<*matrixRowToAmsForm[plugTM101,1,5]*>  
+\end{bmatrix}
+\end{multline*}
+
+Next we have
+%<*plugTM102=timeTMinusOneEx02[[1,2,Range[5]]];*>
+%<*type2TM101=aimType2[testModel,1,plugTM102][[-1]];*>
+%<*plugArgTM103=type2TM101[[Range[15]]];*>
+%<*plugArgTM103=Join[type2TM101[[Range[5]]],timeTMinusOneEx02[[1,3]],type2TM101[[10+Range[5]]]];*>
+%<*plugTM103= paperFunc @@ plugArgTM103;*>
+\begin{gather*}
+  x_{0}=
+  \begin{bmatrix}
+<*matrixRowToAmsForm[plugTM102,1,5]*>
+  \end{bmatrix}\\
+E_{t-1}(x_{1})=
+  \begin{bmatrix}
+<*matrixRowToAmsForm[type2TM101,6,10]*>
+  \end{bmatrix}\\
+E_{t-1}(x_{2})=
+  \begin{bmatrix}
+<*matrixRowToAmsForm[type2TM101,11,15]*>
+  \end{bmatrix}
+\end{gather*}
+{so that}  
+\begin{multline*}
+\epsilon=f(
+\begin{matrix}
+<*matrixRowToAmsForm[plugArgTM103,1,7]*>
+\end{matrix}\\
+\begin{matrix}
+<*matrixRowToAmsForm[plugArgTM103,8,15]*>
+\end{matrix})=\\
+\begin{bmatrix}
+<*matrixRowToAmsForm[plugTM103,1,5]*>  
+\end{bmatrix}
+\end{multline*}
+
+
+Next we have
+%<*plugTM104=timeTMinusOneEx02[[1,3,Range[5]]];*>
+%<*type2TM102=aimType2[testModel,1,plugTM104][[-1]];*>
+%<*plugArgTM105=type2TM102[[Range[15]]];*>
+%<*plugArgTM105=Join[type2TM102[[Range[5]]],timeTMinusOneEx02[[1,4]],type2TM102[[10+Range[5]]]];*>
+%<*plugTM105= paperFunc @@ plugArgTM105;*>
+\begin{gather*}
+  x_{0}=
+  \begin{bmatrix}
+<*matrixRowToAmsForm[plugTM104,1,5]*>
+  \end{bmatrix}\\
+E_{t-1}(x_{2})=
+  \begin{bmatrix}
+<*matrixRowToAmsForm[type2TM102,6,10]*>
+  \end{bmatrix}\\
+E_{t-1}(x_{3})=
+  \begin{bmatrix}
+<*matrixRowToAmsForm[type2TM102,11,15]*>
+  \end{bmatrix}
+\end{gather*}
+{so that}  
+\begin{multline*}
+\epsilon=f(
+\begin{matrix}
+<*matrixRowToAmsForm[plugArgTM105,1,7]*>
+\end{matrix}\\
+\begin{matrix}
+<*matrixRowToAmsForm[plugArgTM105,8,15]*>
+\end{matrix})=\\
+\begin{bmatrix}
+<*matrixRowToAmsForm[plugTM105,1,5]*>  
+\end{bmatrix}
+\end{multline*}
+
+
+
+%<*plugT00=timeTEx02[[1,2,Range[5]]];*>
+%<*type2T02=altAimType2[testModel,1,plugT00][[-1]];*>
+
+%<*plugArgT01=Join[{0,0,0,0,0},type2T02[[Range[10]]]];*>
+%<*plugT01= paperFunc @@ plugArgT01;*>
+For ``t expectations'', initially we have 
+\begin{gather*}
+  x_{-1}=0\\
+E_{t}(x_{0})=
+\begin{bmatrix}
+<*matrixRowToAmsForm[type2T02,1,5]  *>
+\end{bmatrix}\\
+E_{t}(x_{1})=
+\begin{bmatrix}
+<*matrixRowToAmsForm[type2T02,6,10]  *>
+\end{bmatrix}
+\end{gather*}
+{so that}  
+\begin{multline*}
+\epsilon=f(
+\setcounter{MaxMatrixCols}{15}
+\begin{matrix}
+<*matrixRowToAmsForm[plugArgT01,1,7]*>
+\end{matrix}\\
+\begin{matrix}
+<*matrixRowToAmsForm[plugArgT01,8,15]*>
+\end{matrix})=\\
+\begin{bmatrix}
+<*matrixRowToAmsForm[plugT01,1,5]*>  
+\end{bmatrix}
+\end{multline*}
+
+Next we have
+%<*plugT01=timeTEx02[[1,3,Range[5]]];*>
+%<*type2T02=aimType2[testModel,1,plugT01][[-1]];*>
+
+%<*plugArgT03=type2T02[[Range[15]]];*>
+%<*plugArgT03=Join[timeTEx02[[1,2]],type2T02[[Range[10]]]];*>
+%<*plugT03= paperFunc @@ plugArgT03;*>
+\begin{gather*}
+  x_{0}=
+  \begin{bmatrix}
+<*matrixRowToAmsForm[timeTEx02[[1,2]],1,5]*>
+  \end{bmatrix}\\
+E_{t}(x_{1})=
+  \begin{bmatrix}
+<*matrixRowToAmsForm[type2T02,1,5]*>
+  \end{bmatrix}\\
+E_{t}(x_{2})=
+  \begin{bmatrix}
+<*matrixRowToAmsForm[type2T02,6,10]*>
+  \end{bmatrix}
+\end{gather*}
+{so that}  
+\begin{multline*}
+\epsilon=f(
+\begin{matrix}
+<*matrixRowToAmsForm[plugArgT03,1,7]*>
+\end{matrix}\\
+\begin{matrix}
+<*matrixRowToAmsForm[plugArgT03,8,15]*>
+\end{matrix})=\\
+\begin{bmatrix}
+<*matrixRowToAmsForm[plugT03,1,5]*>  
+\end{bmatrix}
+\end{multline*}
+
+
+Next we have
+%<*plugT04=timeTEx02[[1,4,Range[5]]];*>
+%<*type2T03=aimType2[testModel,1,plugT04][[-1]];*>
+%<*plugArgT05=type2T03[[Range[15]]];*>
+%<*plugArgT05=Join[timeTEx02[[1,3]],type2T03[[Range[10]]]];*>
+%<*plugT05= paperFunc @@ plugArgT05;*>
+\begin{gather*}
+  x_{0}=
+  \begin{bmatrix}
+<*matrixRowToAmsForm[timeTEx02[[1,3]],1,5]*>
+  \end{bmatrix}\\
+E_{t}(x_{2})=
+  \begin{bmatrix}
+<*matrixRowToAmsForm[type2T03,1,5]*>
+  \end{bmatrix}\\
+E_{t}(x_{3})=
+  \begin{bmatrix}
+<*matrixRowToAmsForm[type2T03,6,10]*>
+  \end{bmatrix}
+\end{gather*}
+{so that}  
+\begin{multline*}
+\epsilon=f(
+\begin{matrix}
+<*matrixRowToAmsForm[plugArgT05,1,7]*>
+\end{matrix}\\
+\begin{matrix}
+<*matrixRowToAmsForm[plugArgT05,8,15]*>
+\end{matrix})=\\
+\begin{bmatrix}
+<*matrixRowToAmsForm[plugT05,1,5]*>  
+\end{bmatrix}
+\end{multline*}
+
+\section{Multiple Non Linear Paths}
+\label{sec:multpaths}
+The test model has multiple paths converging to the steady state.
+The following solutions employ a stack length of one, but the duplicity 
+persists for longer stack lengths too.
+%<*pathOne=altAimType2[testModel,1,plugT00][[-1]];*>
+%<*pathTwo=aimType2[testModel,1,plugT00][[-1]];*>
+
+\begin{gather*}
+  \begin{bmatrix}
+    <*matrixRowToAmsForm[pvbls,1,5]*>    
+  \end{bmatrix}
+\end{gather*}
+
+\begin{gather*}
+  \begin{bmatrix}
+<*matrixRowToAmsForm[pathOne,1,5]*>    \\
+<*matrixRowToAmsForm[pathOne,6,10]*>    \\
+<*matrixRowToAmsForm[pathOne,11,15]*>    
+\end{bmatrix}
+\end{gather*}
+\begin{gather*}
+  \begin{bmatrix}
+<*matrixRowToAmsForm[pathTwo,1,5]*>    \\
+<*matrixRowToAmsForm[pathTwo,6,10]*>    \\
+<*matrixRowToAmsForm[pathTwo,11,15]*>    
+\end{bmatrix}
+\end{gather*}

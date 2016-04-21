@@ -1,0 +1,7 @@
+%<*toShow=rbcEqns //. simpParamSubs // myN;*>
+\begin{gather*}
+<*toShow[[1]]*>\\
+<*toShow[[2]]*>\\
+<*toShow[[3]]*>
+\end{gather*}
+

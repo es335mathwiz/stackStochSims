@@ -13,7 +13,10 @@ stochSim::usage="stochSim[t0Index_Integer,tfIndex_Integer,replications_Integer,m
 tMinusOne::usage="an expectation type"
 fp::usage="model fixed point"
 qMat::usage="qmat of model"
-Begin["`Private`"] (* Begin Private Context *) 
+aimType2Terror::usage="aimType2Terror[shock_,model_, horizon_, init_]"
+aimType2::usage="aimType2[model_, horizon_, init_]"
+compXEtm1::usage="compXEtm1[model,expectations,shock]"
+Begin["Private`"] (* Begin Private Context *) 
 lags[model_]:=-First[lagsLeads[model]];
 leads[model_]:=Last[lagsLeads[model]];
 eqns[model_]:=Length[model];
@@ -26,7 +29,7 @@ stochSim[t0Index_Integer,tfIndex_Integer,
         replications_Integer,
                 model_Symbol,horizon_Integer,expType_Symbol]:=
 With[{mlags=lags[model]},
-With[{laggedDataValues=xData[model][[t0Index-Range[-mlags,-1]]]},
+With[{laggedDataValues=xData[model][[t0Index+Range[-mlags,-1]]]},
 With[{shockSeqList=
 generateDraws[t0Index,tfIndex,replications,Length[shocks[model]]],
 iterFunc=(generatePathX[{model,horizon,expType,laggedDataValues},#])&},
@@ -69,7 +72,7 @@ With[{expectations=
        Range[-numEq*mlags,-1]]]][[
              -1,Range[numEq*(mlags+mleads+1)]]])},
 {model,horizon,expType,Append[xPath,
-  compXEtm1[model,expectations,shock]]}]]
+  compXEtm1[model,expectations,shock][[numEq*mlags+Range[numEq]]]]}]]
 
 
 aimType2[model_Symbol,horizon_,init_]:=FixedPointList[
@@ -82,22 +85,6 @@ nxtGuess[lags[model],
  SameTest->((((*(*Print[{#1,#2}];*)*)Max[Abs[#1-#2]]<10^(-15)))&)]
 
 
-altAimType2[model_,horizon_,init_]:=
-With[{theArgs={{0., 0., 0., 0., 0., 0.0641495, -0.172672, -0.222054, -0.190656, 0.140763, 
-  0., -0.0488314, 0.00496178, -0.102767, 0.043727}, 
- {0.0641495, -0.172672, -0.222054, -0.190656, 0.140763, 0., -0.0488314, 
-  0.00496178, -0.102767, 0.043727, 0., -0.0158041, -0.00253689, -0.033196, 
-  0.0142162}}},
-FixedPointList[
-nxtGuess[lags[model],
- func[model],
- drvFunc[model],
- qMat[model],
- fp[model],#]&,
- Join[init,Flatten[Table[theArgs[[2]][[5+Range[eqns[model]]]],{(horizon+leads[model])}]]],
- SameTest->(((*(*Print[{#1,#2}];*)*)Max[Abs[#1-#2]]<10^(-15))&)]]
-
-
 
 
 compXEtm1[model_Symbol,expectations_List,shock_List]:=
@@ -106,7 +93,7 @@ With[{mlags=lags[model],mleads=leads[model],
   numEq=Length[func[model][[2]]],
   newFunc=
     Apply[Function,{deFunc[[1]],deFunc[[2]]-shock}]},
-With[{init=expectations[[Range[numEq*mlags]]]},
+With[{},
  FixedPoint[
   nxtGuess[lags[model],
   newFunc,
@@ -114,7 +101,7 @@ With[{init=expectations[[Range[numEq*mlags]]]},
   blockMatrix[{{zeroMatrix[numEq*mleads,numEq*(mlags)],IdentityMatrix[numEq*mleads]}}],
   expectations,#]&,
   expectations,
-  SameTest->(((*(*Print[{#1,#2}];*)*)Max[Abs[#1-#2]]<10^(-15))&)][[numEq*mlags+Range[numEq]]]]]]
+  SameTest->(((*(*Print[{#1,#2}];*)*)Max[Abs[#1-#2]]<10^(-15))&)]]]]
 
 
 
@@ -124,13 +111,8 @@ generateNextXT[
         shockIndex_Integer]:=
 With[{shock=shocks[model][[shockIndex]],
  numEq=Length[func[model][[2]]],
- mleads=leads[model],
  mlags=lags[model]},
-With[{expectations=
-(aimType2[model,horizon,
-   Flatten[xPath][[
-       Range[-numEq*mlags,-1]]]][[
-             -1,Range[numEq*(mlags+mleads+1)]]])},
+With[{},
 {model,horizon,expType,Append[xPath,aimType2Terror[shock,model,horizon,
    Flatten[xPath][[
        Range[-numEq*mlags,-1]]]][[
@@ -151,7 +133,7 @@ theZeroMatsC=Table[zeroMatrix[neq,neq],{nlag}],
 theZeroMatsD=Table[zeroMatrix[neq,1],{nlag}]
 },
 With[{theArgs=Partition[guess,appDim,neq]},
-With[{theRes=Map[Apply[theFunc,#]& , theArgs]},
+With[{},
 With[{newFunc=
     Apply[Function,{theFunc[[1]],theFunc[[2]]-shock}]},
 With[{prime=nxtCDmats[{nlag,
@@ -186,12 +168,6 @@ FixedPointList[
 {#[[1]]+1,aimType2[model,#[[1]]+1,init][[-1,numEq+Range[numEq]]]}&,{0,Table[0,{numEq}]},
 SameTest->(((*Print[{#1,#2}];*)
 Max[Abs[#1[[2]]-#2[[2]]]]<10^(-15))&)]];
-
-altAimType3[model_,initHoriz_,init_]:=
-With[{numEq=Length[func[model][[2]]]},
-FixedPointList[
-{#[[1]]+1,altAimType2[model,#[[1]]+1,init][[-1,numEq+Range[numEq]]]}&,{0,Table[0,{numEq}]},
-SameTest->(((*Print[{#1,#2}];*)Max[Abs[#1[[2]]-#2[[2]]]]<10^(-15))&)]];
 
 
 

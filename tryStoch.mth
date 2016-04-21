@@ -12,7 +12,7 @@ PrependTo[$Path,
 PrependTo[$Path, 
   "../mathAMA/AMAModel"];
 
-Needs["simpleRBCModel`"]
+(*Needs["simpleRBCModel`"]*)
 Needs["Stack`"]
 Needs["Stoch`"]
 
@@ -86,7 +86,58 @@ paperQ = blockMatrix[{{qmat, zeroMatrix[5]}}];
 
 
 
-shk = shocks[testModel];
+
 
 Timing[tryStochT = stochSim[2, 10, 30, testModel, 1, t]];
 tryStochT[[1]] // Chop
+
+tm1Res01=stochSim[2, 2, 1, testModel, 1, tMinusOne];
+tm1Iter01=(aimType2[testModel,1,{-0.3, -0.6, -0.3, -0.6, -0.3}]);
+tm1Xt01=compXEtm1[testModel,tm1Iter01[[-1,Range[15]]],shk[[tm1Res01[[1,2,1]]]]];
+
+
+tm1Iter02=(aimType2[testModel,2,{-0.3, -0.6, -0.3, -0.6, -0.3}]);
+tm1Xt02=compXEtm1[testModel,tm1Iter01[[-1,Range[15]]],shk[[tm1Res01[[1,2,1]]]]];
+
+tRes01=stochSim[2, 2, 1, testModel, 1, t];
+tIter01=(aimType2Terror[Flatten[shk[[tRes01[[1,2]]]]],testModel,1,{-0.3, -0.6, -0.3, -0.6, -0.3}]);
+tIter02=(aimType2Terror[Flatten[shk[[tRes01[[1,2]]]]],testModel,2,{-0.3, -0.6, -0.3, -0.6, -0.3}]);
+
+
+(*
+Transpose[{tIter01[[-1,Range[15]]],tIter02[[-1,Range[15]]]}]//Chop
+*)
+
+
+
+tm1Res20=stochSim[2, 2, 1, testModel, 20, tMinusOne];
+tm1Iter20=(aimType2[testModel,20,{-0.3, -0.6, -0.3, -0.6, -0.3}]);
+tm1Xt20=compXEtm1[testModel,tm1Iter20[[-1,Range[15]]],shk[[tm1Res20[[1,2,1]]]]];
+
+tRes20=stochSim[2, 2, 1, testModel, 20, t];
+tIter20=(aimType2Terror[Flatten[shk[[tRes20[[1,2]]]]],testModel,20,{-0.3, -0.6, -0.3, -0.6, -0.3}]);
+
+
+tm1Res25=stochSim[2, 2, 1, testModel, 25, tMinusOne];
+tm1Iter25=(aimType2[testModel,25,{-0.3, -0.6, -0.3, -0.6, -0.3}]);
+tm1Xt25=compXEtm1[testModel,tm1Iter25[[-1,Range[15]]],shk[[tm1Res25[[1,2,1]]]]];
+tm1Iter26=(aimType2[testModel,26,{-0.3, -0.6, -0.3, -0.6, -0.3}]);
+tm1Xt26=compXEtm1[testModel,tm1Iter26[[-1,Range[15]]],shk[[tm1Res25[[1,2,1]]]]];
+
+tRes25=stochSim[2, 2, 1, testModel, 25, t];
+tIter25=(aimType2Terror[Flatten[shk[[tRes25[[1,2]]]]],testModel,25,{-0.3, -0.6, -0.3, -0.6, -0.3}]);
+tIter26=(aimType2Terror[Flatten[shk[[tRes25[[1,2]]]]],testModel,26,{-0.3, -0.6, -0.3, -0.6, -0.3}]);
+
+FileTemplateApply[boo=FileTemplate["../CStochSims/docs/smallJuillardMmaExample.mtex"],"../CStochSims/docs/smallJuillardMmaExample.tex"]
+
+(*Splice["../CStochSims/docs/smallJuillardMmaExample.mtex"]*)
+
+
+(*
+
+generateNextXTMinusOne[{testModel,20,t,xData[[1]]},{1}]
+
+
+
+
+*)

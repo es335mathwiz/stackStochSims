@@ -58,7 +58,7 @@ almodelFunc::usage=
 
 
 
-Begin["private`"]
+Begin["Private`"]
 
 findVarsParams[func_]:=
 Module[{},
