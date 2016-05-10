@@ -1,10 +1,120 @@
 (* Wolfram Language Package *)
 
-BeginPackage["MmaModelToC`", { "ProtectedSymbols`", "Format`","Stack`", "Experimental`"}]
+BeginPackage["MmaModelToC`", { "ProtectedSymbols`", "Format`","Stack`", "Experimental`","AsymptoticLinearization`"}]
 (* Exported symbols added here with SymbolName::usage *)  
 Print["preprivate"]
 drib::usage="package top"
-Begin["`Private`"] (* Begin Private Context *) 
+$mmaToCHome::usage="target location for generated files";
+coeffDefines::usage="for splicing"
+$runItExt::usage="for splicing"
+$runItInv::usage="for splicing"
+$runItOth::usage="for splicing"
+$lagLeadLoc::usage="forsplicing"
+(*
+$runItExternalDefsLoc::usage="forsplicing"
+$runItInvariantLocalDefsLoc::usage="forsplicing"
+*)
+$runoutFileStringLocalDefsLoc::usage="forsplicing"
+ll:usage="for splicing"
+opVarDefsSFA::usage="for splicing"
+opLinVarDefsSFA::usage="for splicing"
+opNLinVarDefsSFA::usage="for splicing"
+opVarDefsDrvSFA::usage="for splicing"
+opLinVarDefsDrvSFA::usage="for splicing"
+opNLinVarDefsDrvSFA::usage="for splicing"
+linSparseFunctionDerivativeAssignmentsA::usage="for splicing"
+linSparseFunctionDerivativeAssignmentsIA::usage="for splicing"
+linSparseFunctionDerivativeAssignmentsJA::usage="for splicing"
+nlinSparseFunctionDerivativeAssignmentsA::usage="for splicing"
+nlinSparseFunctionDerivativeAssignmentsIA::usage="for splicing"
+nlinSparseFunctionDerivativeAssignmentsJA::usage="for splicing"
+linSparseFunctionAssignmentsA::usage="for splicing"
+linSparseFunctionAssignmentsIA::usage="for splicing"
+linSparseFunctionAssignmentsJA::usage="for splicing"
+nlinSparseFunctionAssignmentsA::usage="for splicing"
+nlinSparseFunctionAssignmentsIA::usage="for splicing"
+nlinSparseFunctionAssignmentsJA::usage="for splicing"
+bLength::usage="for splicing"
+outFileString::usage="for splicing"
+stateVectorDefines::usage="forsplicing"
+modelNumberOfEquations::usage="forsplicing"
+aMat::usage="for splicing"
+iaMat::usage="for splicing"
+jaMat::usage="for splicing"
+sparseFunctionDerivativeAssignmentsA::usage="forsplicing"
+sparseFunctionDerivativeAssignmentsIA::usage="forsplicing"
+sparseFunctionDerivativeAssignmentsJA::usage="forsplicing"
+sparseFunctionAssignmentsA::usage="forsplicing"
+sparseFunctionAssignmentsIA::usage="forsplicing"
+sparseFunctionAssignmentsJA::usage="forsplicing"
+modelData::usage="associates data with model"
+modelExogenous::usage="associates data with model"
+modelFunctionName::usage="associates data with model"
+modelInfo::usage="associates data with model"
+modelDataInfo::usage="associates data with model"
+modelShockInfo::usage="associates data with model"
+modelShocks::usage="associates data with model"
+modelDefaultParameters::usage="associates data with model"
+modelFpGuess::usage="associates data with model"
+modelUpsilonEqns::usage="associates data with model"
+spaceForTempVars::usage="for splicing"
+modelColumns::usage="for splicing"
+dataRows::usage="for splicing"
+shocksRows::usage="for splicing"
+numbExog::usage="for splicing"
+upsilonMatA::usage="for splicing"
+upsilonMatIA::usage="for splicing"
+upsilonMatJA::usage="for splicing"
+exogHMatA::usage="for splicing"
+exogHMatIA::usage="for splicing"
+exogHMatJA::usage="for splicing"
+selectZMatA::usage="for splicing"
+selectZMatIA::usage="for splicing"
+selectZMatJA::usage="for splicing"
+periodPointGuesserAssignments::usage="for splicing"
+guessVector::usage="forsplicing"
+timeOffset::usage="forsplicing"
+numberOfParameters::usage="forsplicing"
+vstr::usage="forsplicing"
+dataCols::usage="for splicing"
+shocksCols::usage="for splicing"
+dstr::usage="for splicing"
+allv::usage="for splicing"
+allcoeffs::usage="for splicing"
+defaultParams::usage="for splicing"
+exogQ::usage="for splicing"
+functionName::usage="for splicing"
+(*
+numberOfEquations
+lags
+leads
+numberOfDataValues
+*)
+Begin["Private`"] (* Begin Private Context *) 
+
+
+allNames[modelEquations_]:=Flatten[findVarsParams[modelEquations]]//.xx_[_]->xx
+(*
+allNames[modelEquations_]:=DeleteCases[
+		Select[Union[Variables[(modelEquations//.funcSubs)//.
+						getVarSubs]//.x_[_]->x],Length[#]==0&],FABS|FMAX|FMIN|myabsv|Log|modelShock];
+*)
+endog[modelEquations_]:=findVarsParams[modelEquations][[1]]
+(*
+endog[modelEquations_]:=Union[Select[DeleteCases[
+		Select[Variables[(modelEquations//.funcSubs)//.getVarSubs],
+				Length[#]==1&],FABS[_]|myabsv[_]|Log[_]|modelShock[_]]//.{x_[t]->x,x_[t+_]->x},Length[#]==0&]];
+*)
+$mmaMcFilesDir=FileNameJoin[Drop[FileNameSplit[FindFile["MmaModelToC`"]], -1]];
+$lagLeadLoc=FileNameJoin[{$mmaMcFilesDir,"lagLead.h"}]
+$runItExt=FileNameJoin[{$mmaMcFilesDir,"runItExternalDefs.h"}]
+$runItInv=FileNameJoin[{$mmaMcFilesDir,"runItInvariantLocalDefs.h"}]
+(*
+$runItExternalDefsLoc=FileNameJoin[{$mmaMcFilesDir,"runItExternalDefs.h"}]
+$runItInvariantLocalDefsLoc=FileNameJoin[{$mmaMcFilesDir,"runItInvariantLocalDefs.h"}]
+*)
+$runItOth=FileNameJoin[{$mmaMcFilesDir,"runItOther.h"}]
+$runoutFileStringLocalDefsLoc=FileNameJoin[{$mmaMcFilesDir,"runoutFileStringLocalDefs.h"}]
 Off[General::spell,General::spell1];
 SetOptions[$Output,PageWidth->73];
 Print["before reading Format and Optimize"]
@@ -17,10 +127,7 @@ Off[AssignFunction::undef]
 Print["doing assigns in mmaToC.m"]
 drab="private"
 Print[{"in private:",Context[drab],drab}]
-(*t=.;*)
-SetAttributes[modelShock,Constant];
-SetAttributes[modelShock,Protected];
-SetAttributes[t,Protected]
+
 funcSubs={Exp$->Exp,Sqrt$->Sqrt,FMIN[x_,y_]->x+y,FMAX[x_,y_]->x+y};
 getVarSubs={Log[E^x_]->x,Power[x_,y_]->x y,Log[x_]->x};
 
@@ -65,15 +172,7 @@ lagsLeads[modelEquations_]:=
 coeffs[modelEquations_]:=With[{an=allNames[modelEquations],
 		endg=endog[modelEquations]},Complement[an,endg,modelExogenous[modelEquations]]]
 
-allNames[modelEquations_]:=DeleteCases[
-		Select[Union[Variables[(modelEquations//.funcSubs)//.
-						getVarSubs]//.x_[_]->x],Length[#]==0&],FABS|FMAX|FMIN|myabsv|Log|modelShock];
-
 newEndog[modelEquations_]:=Union[Cases[modelEquations,x_[t]|x_[t+i_]->x,Infinity]]
-
-endog[modelEquations_]:=Union[Select[DeleteCases[
-		Select[Variables[(modelEquations//.funcSubs)//.getVarSubs],
-				Length[#]==1&],FABS[_]|myabsv[_]|Log[_]|modelShock[_]]//.{x_[t]->x,x_[t+_]->x},Length[#]==0&]];
 
 justExog[modelEquations_]:=Union[
 endog[modelUpsilonEqns[modelEquations]]]
@@ -105,7 +204,7 @@ exogPrenewspdrv[modelEquations_]:=
 With[{exg=modelExogenous[modelEquations]},
 With[{allv=allVars[modelEquations],modeq=Through[exg[t]]},
 With[{forOne=Function[x,
-With[{relevant=Through[Select[exg,Not[FreeQ[x,#]]&][t]]},Print["just after defining relevant"];
+With[{relevant=Through[Select[exg,Not[FreeQ[x,#]]&][t]]},Print["just after defining relevant 1"];
 (Print["mapping a row"];{Print["x=",x,"relevant=",relevant];D[x,#],Position[allv,#]})&/@relevant]]},
 forOne/@modeq]]]
 
@@ -113,7 +212,7 @@ notExogPrenewspdrv[modelEquations_]:=
 With[{exg=modelExogenous[modelEquations]},
 With[{allv=allVars[modelEquations],modeq=Table[0,{Length[exg]}]},
 With[{forOne=Function[x,
-With[{relevant=Through[Select[exg,Not[FreeQ[x,#]]&][t]]},Print["just after defining relevant"];
+With[{relevant=Through[Select[exg,Not[FreeQ[x,#]]&][t]]},Print["just after defining relevant 2"];
 (Print["mapping a row"];{Print["x=",x,"relevant=",relevant];D[x,#],Position[allv,#]})&/@relevant]]},
 forOne/@modeq]]]
 
@@ -126,7 +225,7 @@ With[{(*exg=modelExogenous[modelEquations]*)exg={}},
 With[{allv=allVars[modelEquations]},
 With[{endg=Select[allv,(And @@ (Function[x,FreeQ[#,x]] /@ exg))&]},
 With[{forOne=Function[x,
-With[{relevant=Select[endg,Not[FreeQ[x,#]]&]},Print["just after defining relevant"];
+With[{relevant=Select[endg,Not[FreeQ[x,#]]&]},Print["just after defining relevant 3"];
 (Print["mapping a row, relevant=",relevant,"eqn=",x];{D[x,#],Position[allv,#]})&/@relevant]]},
 forOne/@modelEquations]]]]
 
@@ -135,7 +234,7 @@ With[{endg=justEndog[modelEquations]},
 With[{allv=allVars[modelUpsilonEqns[modelEquations]]},
 With[{exg=Select[allv,(And @@ (Function[x,FreeQ[#,x]] /@ endg))&]},
 With[{forOne=Function[x,
-With[{relevant=Select[exg,Not[FreeQ[x,#]]&]},Print["just after defining relevant"];
+With[{relevant=Select[exg,Not[FreeQ[x,#]]&]},Print["just after defining relevant 4"];
 (Print["mapping a row, relevant=",relevant,"eqn=",x];{D[x,#],Position[allv,#]})&/@relevant]]},
 forOne/@modelEquations]]]]
 
@@ -148,7 +247,7 @@ With[{(*exg=modelExogenous[modelEquations]*)},
 With[{allv=allExogVars[modelEquations],
 modeq=exogEqns/.funcSubs},
 With[{forOne=Function[x,
-With[{relevant=Select[allv,Not[FreeQ[x,#]]&]},Print["just after defining relevant"];
+With[{relevant=Select[allv,Not[FreeQ[x,#]]&]},Print["just after defining relevant 5"];
 (Print["mapping a row, relevant=",relevant,"eqn=",x];{D[x,#],Position[allv,#]})&/@relevant]]},
 forOne/@modeq]]]
 
@@ -171,7 +270,7 @@ With[{allv=allVars[modelEquations],
 modeq=someEqns/.funcSubs},
 With[{endg=Select[allv,(And @@ (Function[x,FreeQ[#,x]] /@ exg))&]},
 With[{forOne=Function[x,
-With[{relevant=Select[endg,Not[FreeQ[x,#]]&]},Print["just after defining relevant"];
+With[{relevant=Select[endg,Not[FreeQ[x,#]]&]},Print["just after defining relevant 6"];
 (Print["mapping a row, relevant=",relevant,"eqn=",x];{D[x,#],Position[allv,#]})&/@relevant]]},
 forOne/@modeq]]]]
 
@@ -198,7 +297,7 @@ With[{exg=modelExogenous[modelEquations]},
 With[{allv=allVars[modelEquations]},
 With[{endg=Select[allv,(Or @@ (Function[x,!FreeQ[#,x]] /@ exg))&]},
 With[{forOne=Function[x,
-With[{relevant=Select[endg,Not[FreeQ[x,#]]&]},Print["just after defining relevant"];
+With[{relevant=Select[endg,Not[FreeQ[x,#]]&]},Print["just after defining relevant 7"];
 (Print["mapping a row, relevant=",relevant,"eqn=",x];{D[x,#],Position[allv,#]})&/@relevant]]},
 forOne/@modelEquations]]]]
 
@@ -494,41 +593,41 @@ defaultParams=InputForm[N[Flatten[
 modelDefaultParameters[modelEquations]]]]; numParams=Length[Flatten[
 modelDefaultParameters[modelEquations]]];
 fpGuessVec=modelFpGuess[modelEquations]; Print["data here"];
-{dataRows,dataCols}=Dimensions[modelData[modelEquations]];Print[{dataRows,dataCols}];Print["huh"];
+{dataRows,dataCols}=Dimensions[modelData[modelEquations]];Print[{dataRows,dataCols}];Print["huh",modelData[modelEquations]];
 vstr=StringReplace[ToString[InputForm[N[Flatten[modelData[modelEquations]]]]],{"*^-"->"e-"}];
 valsInfo=modelDataInfo[modelEquations]; Print["shocks"];
 {shocksRows,shocksCols}=Dimensions[modelShocks[modelEquations]];
 dvalsInfo=modelShocksInfo[modelEquations];
 dstr=StringReplace[ToString[InputForm[N[Flatten[modelShocks[modelEquations]]]]],{"*^-"->"e-"}];
 Print["splicing mmaToC.mc"];
-Splice[$mmaToCHome<>"/mmaToC.mc",outFile<>".c",FormatType->OutputForm,
+Splice[$mmaMcFilesDir<>"/mmaToC.mc",outFile<>".c",FormatType->OutputForm,
 PageWidth->Infinity(*Max[100000,(11/10)*dataRows*dataCols]*)];
 Print["splicing mmaToCDrv.mc"];
-Splice[$mmaToCHome<>"/mmaToCDrv.mc",outFile<>"Drv.c",FormatType->OutputForm,
+Splice[$mmaMcFilesDir<>"/mmaToCDrv.mc",outFile<>"Drv.c",FormatType->OutputForm,
 PageWidth->Infinity(*Max[100000,(11/10)*dataRows*dataCols]*)];
 Print["splicing mmaToCSupport.mc"];
 lngendg=bothExogEndog[modelEquations]; exg=justExog[modelEquations];
 exogPos=Flatten[Position[lngendg,#]& /@ exg];
 exogQ=Table[0,{Length[lngendg]}]; exogQ[[exogPos]]=1;
-Splice[$mmaToCHome<>"/mmaToCSupport.mc",outFile<>"Support.c",FormatType->OutputForm,
+Splice[$mmaMcFilesDir<>"/mmaToCSupport.mc",outFile<>"Support.c",FormatType->OutputForm,
 PageWidth->Infinity(*Max[100000,(11/10)*dataRows*dataCols]*)];
 Print["splicing mmaToCData.mc"];
-Splice[$mmaToCHome<>"/mmaToCData.mc",outFile<>"Data.c",FormatType->OutputForm,
+Splice[$mmaMcFilesDir<>"/mmaToCData.mc",outFile<>"Data.c",FormatType->OutputForm,
 PageWidth->Infinity(*Max[100000,(11/10)*dataRows*dataCols]*)];
 Print["splicing mmaToCShocks.mc"];
-Splice[$mmaToCHome<>"/mmaToCShocks.mc",outFile<>"Shocks.c",FormatType->OutputForm,
+Splice[$mmaMcFilesDir<>"/mmaToCShocks.mc",outFile<>"Shocks.c",FormatType->OutputForm,
 PageWidth->Infinity(*Max[100000,(11/10)*dataRows*dataCols]*)];
-Print["splicing runIt.mc"]; Splice[$mmaToCHome<>"/runIt.mc","run" <>
+Print["splicing runIt.mc"]; Splice[$mmaMcFilesDir<>"/runIt.mc","run" <>
 outFile<>".c",FormatType->OutputForm,PageWidth->Infinity];
 Print["splicing mpiRunIt.mc"];
-Splice[$mmaToCHome<>"/mpiRunIt.mc","mpirun" <>
+Splice[$mmaMcFilesDir<>"/mpiRunIt.mc","mpirun" <>
 outFile<>".c",FormatType->OutputForm,PageWidth->Infinity];
 Print["splicing makeFl.mc"];
-Splice[$mmaToCHome<>"/makeFl.mc","make"<>outFile,FormatType->OutputForm,PageWidth->Infinity];
-Splice[$mmaToCHome<>"/runItLocalDefs.mc","run"<>outFile<>"LocalDefs.h",FormatType->OutputForm,PageWidth->Infinity];
-Splice[$mmaToCHome<>"/mmaToCDataInclude.mc",outFile<>"DataForInclude.h",FormatType->OutputForm,
+Splice[$mmaMcFilesDir<>"/makeFl.mc","make"<>outFile,FormatType->OutputForm,PageWidth->Infinity];
+Splice[$mmaMcFilesDir<>"/runItLocalDefs.mc","run"<>outFile<>"LocalDefs.h",FormatType->OutputForm,PageWidth->Infinity];
+Splice[$mmaMcFilesDir<>"/mmaToCDataInclude.mc",outFile<>"DataForInclude.h",FormatType->OutputForm,
 PageWidth->Infinity(*Max[100000,(11/10)*dataRows*dataCols]*)];
-Splice[$mmaToCHome<>"/mmaToCShockInclude.mc",outFile<>"ShocksForInclude.h",FormatType->OutputForm,
+Splice[$mmaMcFilesDir<>"/mmaToCShockInclude.mc",outFile<>"ShocksForInclude.h",FormatType->OutputForm,
 PageWidth->Infinity(*Max[100000,(11/10)*dataRows*dataCols]*)]; ];
 
 genDefines[theEqStr_String]:=
@@ -560,11 +659,11 @@ valsInfo=modelDataInfo[modelEquations];
 dvalsInfo=modelShocksInfo[modelEquations];
 dstr=StringReplace[ToString[InputForm[N[Flatten[modelShocks[modelEquations]]]]],{"*^-"->"e-"}];
 Print["splicing mmaToCData.mc"];
-Splice[$mmaToCHome<>"/mmaToCData.mc",outFile<>"Data.c",FormatType->OutputForm,
+Splice[$mmaMcFilesDir<>"/mmaToCData.mc",outFile<>"Data.c",FormatType->OutputForm,
 	PageWidth->Infinity(*Max[100000,(11/10)*dataRows*dataCols]*)];
-Splice[$mmaToCHome<>"/mmaToCShockInclude.mc",outFile<>"ShocksForInclude.h",FormatType->OutputForm,
+Splice[$mmaMcFilesDir<>"/mmaToCShockInclude.mc",outFile<>"ShocksForInclude.h",FormatType->OutputForm,
 	PageWidth->Infinity(*Max[100000,(11/10)*dataRows*dataCols]*)];
-Splice[$mmaToCHome<>"/mmaToCDataInclude.mc",outFile<>"DataForInclude.h",FormatType->OutputForm,
+Splice[$mmaMcFilesDir<>"/mmaToCDataInclude.mc",outFile<>"DataForInclude.h",FormatType->OutputForm,
 	PageWidth->Infinity(*Max[100000,(11/10)*dataRows*dataCols]*)];
 ];
 Print["done reading MmaModelToC.m"]

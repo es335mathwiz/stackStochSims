@@ -13,24 +13,27 @@ rr[t]- (rs[t] - 0.414 pdot[t+1] - (1-0.414)pdot[t-1]),
 rs[t] - (3 pdot[t]+ y[t]),
 y[t] - (0.304 y[t-1] - 0.98 rr[t] - 0.315 rr[t-1] - ey[t-1])
 }/.stochSubs;
-
-modelFunctionName[juillardModel]="julMod";
-modelInfo[juillardModel]=
-  "juillard example from paper describing stack";
-modelDataInfo[juillardModel]="made up data from normal dist";
-modelData[juillardModel]=Table[RandomVariate[
-  MultinormalDistribution[{0,0,0,0,0},
-    IdentityMatrix[5]]],{50}];
-modelShockInfo[juillardModel]="made up data from normal dist";
-modelShocks[juillardModel]=
- Table[RandomVariate[MultinormalDistribution[{0,0,0,0,0},
-   IdentityMatrix[5]]],{30}];
-modelDefaultParameters[juillardModel]={0.000,0.049};
-
 Print["solving  sseqns for ey,pdot,rr,rs,y"];
 juillardEqns=Thread[(juillardModel)==0];
 sseqns=Simplify[juillardEqns/.
   {ey[_]->ey,pdot[_]->pdot,rr[_]->rr,rs[_]->rs,y[_]->y}];
 {lsome,some}=(Solve[sseqns,{ey,pdot,rr,rs,y}]//Simplify);
 rsome=(Reduce[sseqns,{ey,pdot,rr,rs,y}]//Simplify);
-modelFpGuess[juillardModel]=({ey,pdot,rr,rs,y}/.some);
+
+
+modelFunctionName[juillardEqns]="julMod";
+modelInfo[juillardEqns]=
+  "juillard example from paper describing stack";
+modelDataInfo[juillardEqns]="made up data from normal dist";
+modelData[juillardEqns]=Table[RandomVariate[
+  MultinormalDistribution[{0,0,0,0,0},
+    IdentityMatrix[5]]],{50}];
+modelShockInfo[juillardEqns]="made up data from normal dist";
+modelShocks[juillardEqns]=
+ Table[RandomVariate[MultinormalDistribution[{0,0,0,0,0},
+   IdentityMatrix[5]]],{30}];
+modelDefaultParameters[juillardEqns]={0.000,0.049};
+
+
+
+modelFpGuess[juillardEqns]=({ey,pdot,rr,rs,y}/.some);
