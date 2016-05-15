@@ -1,31 +1,25 @@
-#/*Mathematica Creation Date<*Date[]*>*/
-GARYHOME = /mq/home/m1gsa00/
-SPARSELIB = -L$(GARYHOME)/dataHome/sparse/SPARSKIT2 -lskit
-DEBSPARSELIB = -L$(GARYHOME)/dataHome/sparse/SPARSKIT2 -ldebSkit
+CSTOCHSIMSDIR = /msu/home/m1gsa00/git/CStochSims/
+SPARSELIB = $(CSTOCHSIMSDIR)/ranlib.o
+DEBSPARSELIB = $(SPARSELIB)
 
-LAPACK  = $(GARYHOME)/lapack/LAPACK/lapack_os5.a \
-	$(GARYHOME)/lapack/LAPACK/blas_os5.a
+LAPACK  = -L/opt/atlas/lib/ -lcblas -lf77blas -latlas -llapack
 
-RANDOMLIB = -L$(GARYHOME)/matlab/ranlib_c-93/src -lran 
+RANDOMLIB = $(SPARSELIB)
+SPAMADIR = $(CSTOCHSIMSDIR)../sparseAMA
+SPAMAINCLUDE = -I$(SPAMADIR)/src/main/include
+STOCHSIMSINCLUDE = -I$(CSTOCHSIMSDIR)/consolidateHome/cFiles/nuwebTree/stochSims 
 
-SPAIMINCLUDE = -I$(GARYHOME)/consolidateHome/cFiles/nuwebTree/sparseAim
-STOCHSIMSINCLUDE = -I$(GARYHOME)/consolidateHome/cFiles/nuwebTree/stochSims \
--I$(GARYHOME)/consolidateHome/mathFiles/src/codeGeneration/ -I$(GARYHOME)/consolidateHome/myPapers/beowulf/justInCase/include
-SPAIMLIB = -L$(GARYHOME)/consolidateHome/cFiles/nuwebTree/sparseAim -lsparseAim
-DEBSPAIMLIB = -L$(GARYHOME)/consolidateHome/cFiles/nuwebTree/sparseAim -ldebSparseAim \
- -L$(GARYHOME)/f2c/libf2c/  -l f2c
 
-STACKLIB = -L$(GARYHOME)/consolidateHome/cFiles/nuwebTree/stackC -lstackC
-DEBSTACKLIB = -L$(GARYHOME)/consolidateHome/cFiles/nuwebTree/stackC -ldebStackC \
- -L$(GARYHOME)/f2c/libf2c/  -l f2c
+SPAMALIB = $(CSTOCHSIMSDIR)
+DEBSPAMALIB = $(CSTOCHSIMSDIR)
+STACKLIB = $(CSTOCHSIMSDIR)
+DEBSTACKLIB = $(CSTOCHSIMSDIR)
+STOCHLIB = $(CSTOCHSIMSDIR)
+DEBSTOCHLIB = $(CSTOCHSIMSDIR)
 
-STOCHLIB = -L$(GARYHOME)/consolidateHome/cFiles/nuwebTree/stochSims -lstochSims
-DEBSTOCHLIB = -L$(GARYHOME)/consolidateHome/cFiles/nuwebTree/stochSims -ldebStochSims\
- -L$(GARYHOME)/f2c/libf2c/  -l f2c
+CFLAGS = $(SPAMAINCLUDE) -O4  -fno-builtin-exit -fno-builtin-strcat -fno-builtin-strncat -fno-builtin-strcpy -fno-builtin-strlen -fno-builtin-calloc
 
-CFLAGS = $(SPAIMINCLUDE) -O4  -fno-builtin-exit -fno-builtin-strcat -fno-builtin-strncat -fno-builtin-strcpy -fno-builtin-strlen -fno-builtin-calloc
-
-LINKFLAGS = -O4
+LINKFLAGS = -O4  -v  -lc -ldl -lm -L../sparseAMA/target/nar/sparseAMA-1.0-SNAPSHOT-amd64-Linux-g++-shared/lib/amd64-Linux-g++/shared -lsparseAMA-1.0-SNAPSHOT $(CSTOCHSIMSDIR)stackC.o $(CSTOCHSIMSDIR)stochProto.o
 
 .SUFFIXES:	.o .c .h
 
@@ -73,11 +67,21 @@ mpirun<*outFileString*>.o:	mpirun<*outFileString*>.c run<*outFileString*>LocalDe
 
 run<*outFileString*>:	<*outFileString*>.o run<*outFileString*>.o \
 	<*outFileString*>Drv.o <*outFileString*>Support.o \
-	<*outFileString*>Data.o <*outFileString*>Shocks.o
-	f77 -o run<*outFileString*> -O4 <*outFileString*>.o run<*outFileString*>.o \
+	<*outFileString*>Data.o <*outFileString*>Shocks.o 
+	gfortran -o run<*outFileString*> -O4 <*outFileString*>.o run<*outFileString*>.o \
 	<*outFileString*>Drv.o <*outFileString*>Support.o \
-	<*outFileString*>Data.o <*outFileString*>Shocks.o\
-	$(STOCHLIB) $(STACKLIB) $(SPARSELIB) \
-		-v  -lc -ldl -lm $(SPAIMLIB) $(LAPACK) $(RANDOMLIB)\
+	<*outFileString*>Data.o <*outFileString*>Shocks.o \
+	  $(SPARSELIB) $(CSTOCHSIMSDIR)myNewt.o\
+		-v  -lc -ldl -lm  $(LINKFLAGS) $(LAPACK) 
+
+
+debrun<*outFileString*>:	deb<*outFileString*>.o debrun<*outFileString*>.o \
+	deb<*outFileString*>Drv.o deb<*outFileString*>Support.o \
+	deb<*outFileString*>Data.o deb<*outFileString*>Shocks.o 
+	gfortran -o debrun<*outFileString*> -O4 deb<*outFileString*>.o debrun<*outFileString*>.o \
+	deb<*outFileString*>Drv.o deb<*outFileString*>Support.o \
+	deb<*outFileString*>Data.o deb<*outFileString*>Shocks.o \
+	  $(SPARSELIB) $(CSTOCHSIMSDIR)debMyNewt.o\
+		-v  -lc -ldl -lm  $(LINKFLAGS) $(LAPACK) 
 
 

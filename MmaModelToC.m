@@ -84,6 +84,8 @@ allcoeffs::usage="for splicing"
 defaultParams::usage="for splicing"
 exogQ::usage="for splicing"
 functionName::usage="for splicing"
+modelCreationInfo::usage="for splicing"
+modelMatrix::usage="for splicing"
 (*
 numberOfEquations
 lags
@@ -601,7 +603,7 @@ dvalsInfo=modelShocksInfo[modelEquations];
 dstr=StringReplace[ToString[InputForm[N[Flatten[modelShocks[modelEquations]]]]],{"*^-"->"e-"}];
 Print["splicing mmaToC.mc"];
 Splice[$mmaMcFilesDir<>"/mmaToC.mc",outFile<>".c",FormatType->OutputForm,
-PageWidth->Infinity(*Max[100000,(11/10)*dataRows*dataCols]*)];
+PageWidth->Infinity(*Max[100000,(11/10)*Rows*dataCols]*)];
 Print["splicing mmaToCDrv.mc"];
 Splice[$mmaMcFilesDir<>"/mmaToCDrv.mc",outFile<>"Drv.c",FormatType->OutputForm,
 PageWidth->Infinity(*Max[100000,(11/10)*dataRows*dataCols]*)];
