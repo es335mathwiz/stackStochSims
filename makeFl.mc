@@ -65,7 +65,7 @@ run<*outFileString*>:	<*outFileString*>.o run<*outFileString*>.o \
 	gfortran -o run<*outFileString*> -O4 <*outFileString*>.o run<*outFileString*>.o \
 	<*outFileString*>Drv.o <*outFileString*>Support.o \
 	<*outFileString*>Data.o <*outFileString*>Shocks.o \
-	  $(RANLIBLOC) $(CSTOCHSIMSDIR)myNewt.o\
+	  $(RANLIBLOC) $(CSTOCHSIMSDIR)myNewt.o ../CStochSims/ma50ad.o\
 		-v  -lc -ldl -lm  $(LINKFLAGS) $(LAPACK) 
 
 
@@ -75,7 +75,7 @@ debrun<*outFileString*>:	deb<*outFileString*>.o debrun<*outFileString*>.o \
 	gfortran -g -o debrun<*outFileString*>  deb<*outFileString*>.o debrun<*outFileString*>.o \
 	deb<*outFileString*>Drv.o deb<*outFileString*>Support.o \
 	deb<*outFileString*>Data.o deb<*outFileString*>Shocks.o \
-	  $(RANLIBLOC) $(CSTOCHSIMSDIR)debMyNewt.o\
+	  $(RANLIBLOC) $(CSTOCHSIMSDIR)debMyNewt.o ../CStochSims/ma50ad.o\
 		-v  -lc -ldl -lm  $(LINKFLAGS) $(LAPACK) 
 
 
