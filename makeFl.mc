@@ -67,6 +67,9 @@ run<*outFileString*>:	<*outFileString*>.o run<*outFileString*>.o \
 	<*outFileString*>Data.o <*outFileString*>Shocks.o \
 	  $(RANLIBLOC) $(CSTOCHSIMSDIR)myNewt.o ../CStochSims/ma50ad.o\
 		-v  -lc -ldl -lm  $(LINKFLAGS) $(LAPACK) 
+		@echo "to run requires runtime mod-> LD_LIBRARY_PATH=../sparseAMA/target/nar/sparseAMA-1.0-SNAPSHOT-amd64-Linux-g++-shared/lib/amd64-Linux-g++/shared:$(LD_LIBRARY_PATH)"
+
+
 
 
 debrun<*outFileString*>:	deb<*outFileString*>.o debrun<*outFileString*>.o \
@@ -77,5 +80,5 @@ debrun<*outFileString*>:	deb<*outFileString*>.o debrun<*outFileString*>.o \
 	deb<*outFileString*>Data.o deb<*outFileString*>Shocks.o \
 	  $(RANLIBLOC) $(CSTOCHSIMSDIR)debMyNewt.o ../CStochSims/ma50ad.o\
 		-v  -lc -ldl -lm  $(LINKFLAGS) $(LAPACK) 
-
+		@echo "to run requires runtime mod-> LD_LIBRARY_PATH=../sparseAMA/target/nar/sparseAMA-1.0-SNAPSHOT-amd64-Linux-g++-shared/lib/amd64-Linux-g++/shared:$(LD_LIBRARY_PATH)"
 

@@ -15,7 +15,7 @@ $runItExternalDefsLoc::usage="forsplicing"
 $runItInvariantLocalDefsLoc::usage="forsplicing"
 *)
 $runoutFileStringLocalDefsLoc::usage="forsplicing"
-ll:usage="for splicing"
+ll::usage="for splicing"
 opVarDefsSFA::usage="for splicing"
 opLinVarDefsSFA::usage="for splicing"
 opNLinVarDefsSFA::usage="for splicing"
@@ -206,16 +206,16 @@ exogPrenewspdrv[modelEquations_]:=
 With[{exg=modelExogenous[modelEquations]},
 With[{allv=allVars[modelEquations],modeq=Through[exg[t]]},
 With[{forOne=Function[x,
-With[{relevant=Through[Select[exg,Not[FreeQ[x,#]]&][t]]},Print["just after defining relevant 1"];
-(Print["mapping a row"];{Print["x=",x,"relevant=",relevant];D[x,#],Position[allv,#]})&/@relevant]]},
+With[{relevant=Through[Select[exg,Not[FreeQ[x,#]]&][t]]},(*Print["just after defining relevant 1"];*)
+((*Print["mapping a row"];*){(*Print["x=",x,"relevant=",relevant];*)D[x,#],Position[allv,#]})&/@relevant]]},
 forOne/@modeq]]]
 
 notExogPrenewspdrv[modelEquations_]:=
 With[{exg=modelExogenous[modelEquations]},
 With[{allv=allVars[modelEquations],modeq=Table[0,{Length[exg]}]},
 With[{forOne=Function[x,
-With[{relevant=Through[Select[exg,Not[FreeQ[x,#]]&][t]]},Print["just after defining relevant 2"];
-(Print["mapping a row"];{Print["x=",x,"relevant=",relevant];D[x,#],Position[allv,#]})&/@relevant]]},
+With[{relevant=Through[Select[exg,Not[FreeQ[x,#]]&][t]]},(*Print["just after defining relevant 2"];*)
+((*Print["mapping a row"];*){(*Print["x=",x,"relevant=",relevant];*)D[x,#],Position[allv,#]})&/@relevant]]},
 forOne/@modeq]]]
 
 endogIn[modEq_,sys_List]:=With[{endg=endog[modEq]},Complement[endg,modelExogenous[sys]]]
@@ -227,8 +227,8 @@ With[{(*exg=modelExogenous[modelEquations]*)exg={}},
 With[{allv=allVars[modelEquations]},
 With[{endg=Select[allv,(And @@ (Function[x,FreeQ[#,x]] /@ exg))&]},
 With[{forOne=Function[x,
-With[{relevant=Select[endg,Not[FreeQ[x,#]]&]},Print["just after defining relevant 3"];
-(Print["mapping a row, relevant=",relevant,"eqn=",x];{D[x,#],Position[allv,#]})&/@relevant]]},
+With[{relevant=Select[endg,Not[FreeQ[x,#]]&]},(*Print["just after defining relevant 3"];*)
+((*Print["mapping a row, relevant=",relevant,"eqn=",x];*){D[x,#],Position[allv,#]})&/@relevant]]},
 forOne/@modelEquations]]]]
 
 notPrenewspdrv[modelEquations_]:=
@@ -236,8 +236,8 @@ With[{endg=justEndog[modelEquations]},
 With[{allv=allVars[modelUpsilonEqns[modelEquations]]},
 With[{exg=Select[allv,(And @@ (Function[x,FreeQ[#,x]] /@ endg))&]},
 With[{forOne=Function[x,
-With[{relevant=Select[exg,Not[FreeQ[x,#]]&]},Print["just after defining relevant 4"];
-(Print["mapping a row, relevant=",relevant,"eqn=",x];{D[x,#],Position[allv,#]})&/@relevant]]},
+With[{relevant=Select[exg,Not[FreeQ[x,#]]&]},(*Print["just after defining relevant 4"];*)
+((*Print["mapping a row, relevant=",relevant,"eqn=",x];*){D[x,#],Position[allv,#]})&/@relevant]]},
 forOne/@modelEquations]]]]
 
 
@@ -249,8 +249,8 @@ With[{(*exg=modelExogenous[modelEquations]*)},
 With[{allv=allExogVars[modelEquations],
 modeq=exogEqns/.funcSubs},
 With[{forOne=Function[x,
-With[{relevant=Select[allv,Not[FreeQ[x,#]]&]},Print["just after defining relevant 5"];
-(Print["mapping a row, relevant=",relevant,"eqn=",x];{D[x,#],Position[allv,#]})&/@relevant]]},
+With[{relevant=Select[allv,Not[FreeQ[x,#]]&]},(*Print["just after defining relevant 5"];*)
+((*Print["mapping a row, relevant=",relevant,"eqn=",x];*){D[x,#],Position[allv,#]})&/@relevant]]},
 forOne/@modeq]]]
 
 
@@ -272,8 +272,8 @@ With[{allv=allVars[modelEquations],
 modeq=someEqns/.funcSubs},
 With[{endg=Select[allv,(And @@ (Function[x,FreeQ[#,x]] /@ exg))&]},
 With[{forOne=Function[x,
-With[{relevant=Select[endg,Not[FreeQ[x,#]]&]},Print["just after defining relevant 6"];
-(Print["mapping a row, relevant=",relevant,"eqn=",x];{D[x,#],Position[allv,#]})&/@relevant]]},
+With[{relevant=Select[endg,Not[FreeQ[x,#]]&]},(*Print["just after defining relevant 6"];*)
+((*Print["mapping a row, relevant=",relevant,"eqn=",x];*){D[x,#],Position[allv,#]})&/@relevant]]},
 forOne/@modeq]]]]
 
 
@@ -299,8 +299,8 @@ With[{exg=modelExogenous[modelEquations]},
 With[{allv=allVars[modelEquations]},
 With[{endg=Select[allv,(Or @@ (Function[x,!FreeQ[#,x]] /@ exg))&]},
 With[{forOne=Function[x,
-With[{relevant=Select[endg,Not[FreeQ[x,#]]&]},Print["just after defining relevant 7"];
-(Print["mapping a row, relevant=",relevant,"eqn=",x];{D[x,#],Position[allv,#]})&/@relevant]]},
+With[{relevant=Select[endg,Not[FreeQ[x,#]]&]},(*Print["just after defining relevant 7"];*)
+((*Print["mapping a row, relevant=",relevant,"eqn=",x];*){D[x,#],Position[allv,#]})&/@relevant]]},
 forOne/@modelEquations]]]]
 
 
@@ -411,13 +411,13 @@ With[{rws=Flatten[MapIndexed[Table[#2[[1]],{#1[[2]]-#[[1]]}]&, prs]]},
 spMat @@Transpose[{rws,ja,a}]]]]
 
 spMatToVec[sp_spMat,rws_Integer]:=
-Module[{$toPop=Table[0,{rws}]},Print["in spMatToVec rws=",rws];
+Module[{$toPop=Table[0,{rws}]},(*Print["in spMatToVec rws=",rws];*)
 ($toPop[[#[[1]]]]=#[[3]]) & /@ sp;
 $toPop]
 
 sparseAmuB[{a_,ja_,ia_},{b_,jb_,ib_}]:=
 With[{spa=csrToSpmat[{a,ja,ia}],spb=csrToSpmat[{b,jb,ib}]},
-(spMat @@((Join @@ DeleteCases[((Print["doing ",#];multRow[#,spb])& /@ 
+(spMat @@((Join @@ DeleteCases[(((*Print["doing ",#];*)multRow[#,spb])& /@ 
 spa),{}])))//.sumSameIJ]
 
 trySeries[modelEquation_]:=
@@ -495,7 +495,7 @@ modelCreationInfo=modelInfo[modelEquations]; Print["modelMatrix"];
 modelMatrix=denseColToSparseMat[Join[modelEquations(*/.funcSubs*),
 Table[0,{Length[modelExogenous[modelEquations]]}]]]//.timeSubs;
 forSeq= Sequence @@ ({#,ToExpression["linPt$" <>ToString[#]],1}&
-/@allVars[modelEquations]); Print[modelMatrix//InputForm];Print["linModel"];
+/@allVars[modelEquations]);(* Print[modelMatrix//InputForm];Print["linModel"];*)
 notsmodelSparseDrvs=spdrvs[modelEquations];
 modelSparseDrvs=notsmodelSparseDrvs//.timeSubs;
 complexLinModel=Join[(Print["starting
@@ -504,10 +504,10 @@ linModel=Chop[Print["starting
 simplify"];complexLinModel/.reallyLinearSubs];
 (*linModel=Chop[Print["starting
 simplify"];Simplify[complexLinModel/.reallyLinearSubs]];*)
-Print["nlinPartModel"];Print["****",modelEquations,"****",linModel,"****"];
-nlinPartModel=Join[Chop[Print["starting
-simplify"];modelEquations-(linModel[[Range[Length[modelEquations]]]])],
-Table[0,{Length[linModel]-Length[modelEquations]}]];Print["nlinpart",nlinPartModel];Print["?????",linModel[[2]],"?????",modelEquations[[2]],"????"];
+(*Print["nlinPartModel"];Print["****",modelEquations,"****",linModel,"****"];*)
+nlinPartModel=Join[Chop[(*Print["starting simplify"];*)
+	modelEquations-(linModel[[Range[Length[modelEquations]]]])],
+Table[0,{Length[linModel]-Length[modelEquations]}]];(*Print["nlinpart",nlinPartModel];Print["?????",linModel[[2]],"?????",modelEquations[[2]],"????"];*)
 (*nlinPartModel=Join[Chop[Print["starting
 simplify"];Simplify[modelEquations-(linModel[[Range[Length[modelEquations]]]])]],
 Table[0,{Length[linModel]-Length[modelEquations]}]];Print["nlinpart",nlinPartModel];Print["?????",linModel[[2]],"?????",modelEquations[[2]],"????"];*)
@@ -594,8 +594,8 @@ okay,FormatType->OutputForm];
 defaultParams=InputForm[N[Flatten[
 modelDefaultParameters[modelEquations]]]]; numParams=Length[Flatten[
 modelDefaultParameters[modelEquations]]];
-fpGuessVec=modelFpGuess[modelEquations]; Print["data here"];
-{dataRows,dataCols}=Dimensions[modelData[modelEquations]];Print[{dataRows,dataCols}];Print["huh",modelData[modelEquations]];
+fpGuessVec=modelFpGuess[modelEquations]; Print["data"];
+{dataRows,dataCols}=Dimensions[modelData[modelEquations]];(*Print[{dataRows,dataCols}];Print["huh",modelData[modelEquations]];*)
 vstr=StringReplace[ToString[InputForm[N[Flatten[modelData[modelEquations]]]]],{"*^-"->"e-"}];
 valsInfo=modelDataInfo[modelEquations]; Print["shocks"];
 {shocksRows,shocksCols}=Dimensions[modelShocks[modelEquations]];
