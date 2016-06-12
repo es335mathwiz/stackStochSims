@@ -1,13 +1,4 @@
-(* Wolfram Language Package *)
-
-(* Created by the Wolfram Workbench Mar 1, 2016 *)
-
-BeginPackage["stackStochSimsProj`", {"JLink`","Stack`"}]
-(* Exported symbols added here with SymbolName::usage *) 
-$toggleDirLoc::usage="loc of toggle dir"
-Begin["Private`"]
-(* Implementation of the package *)
-SetDirectory["g:/git/stackStochSims"]
+SetDirectory["~/git/stackStochSims"]
 
 
 $toggleDirLoc=FileNameJoin[{Directory[],"/"},OperatingSystem->$OperatingSystem];
@@ -32,18 +23,11 @@ $accPath,
 $proPath,
 $fmtPath,
 $stackStochPath
-(*,
-$amaSer,
-$smolPath*)}];
+(*,$amaSer,$smolPath*)}];
 
 $toSoftware=FileNameJoin[{$toGit, "../softwareInstalls/"}];
 $reposLoc=FileNameJoin[{$toGit,"../.m2/repository"}]
-(*
-Needs["AMAModel`"]
-Needs["AccelerateAMA`"]
-Needs["Stack`"]
-Needs["Stoch`"]
-*)
+(*Needs["AMAModel`"]Needs["AccelerateAMA`"]Needs["Stack`"]Needs["Stoch`"]*)
 
 Needs["JLink`"]
 InstallJava[];
@@ -58,7 +42,32 @@ AddToClassPath[FileNameJoin[{$reposLoc,"xalan-j_2_7_1/xalan/2-7-1/xalan-2-7-1.ja
 Print[FileNameJoin[{$reposLoc,"xalan-j_2_7_1/xalan/2-7-1/xalan-2-7-1.jar"}]]
 Print["setup in stackStochSimsProj"]
 
-End[]
 
-EndPackage[]
 
+
+Get["MmaModelToC`"]
+
+
+Get["toggleFile.m"]
+
+
+Get["rbcGenC.m"]
+
+(*
+
+applyTemplates["muddy", rbcForC]
+
+DeleteFile["mookey.c"]; Private`writeModelDotC["mookey", 
+ Private`makeModelDotCAList[rbcForC]]
+
+
+DeleteFile["mookeyDrv.c"]; Private`writeModelDotCDrv["mookey", 
+ Private`makeModelDotCAList[rbcForC]]
+
+DeleteFile["mookeyMakefile"]; Private`writeMakefile["mookey", 
+ Private`makeModelDotCAList[rbcForC]]
+
+
+DeleteFile["mookeyCSupport"]; Private`writeCSupport["mookey", 
+ Private`makeModelDotCAList[rbcForC]]
+*)

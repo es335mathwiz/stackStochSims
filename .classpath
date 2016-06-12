@@ -2,5 +2,7 @@
 <classpath>
 	<classpathentry kind="src" path="javaSource"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="G:/.m2/repository/SAXON-HE/saxon9-xqj/9-7-0-2/saxon9-xqj-9-7-0-2.jar"/>
+	<classpathentry kind="lib" path="G:/.m2/repository/SAXON-HE/saxon9he/9-7-0-2/saxon9he-9-7-0-2.jar"/>
 	<classpathentry kind="output" path="javaOutput"/>
 </classpath>

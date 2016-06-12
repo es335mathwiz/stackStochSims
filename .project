@@ -3,6 +3,10 @@
 	<name>stachStochSimsProj</name>
 	<comment></comment>
 	<projects>
+		<project>AccelerateAMA</project>
+		<project>AMAModel</project>
+		<project>DynareToAMAModel</project>
+		<project>NumericAMA</project>
 		<project>ProtectedSymbolsProject</project>
 		<project>SymbolicAMA</project>
 	</projects>
