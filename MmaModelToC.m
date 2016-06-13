@@ -3,6 +3,11 @@
 BeginPackage["MmaModelToC`", { "ProtectedSymbols`", "Format`","Stack`", "Experimental`","AsymptoticLinearization`"}]
 (* Exported symbols added here with SymbolName::usage *)  
 Print["preprivate"]
+
+myCAssign::usage="use ToString to eliminate OutputForm ColumnForm"
+
+
+
 applyTemplates::usage="applyTemplates[modName_String,eqns_?VectorQ]"
 modelData::usage="associates data with model"
 modelExogenous::usage="associates data with model"
@@ -112,6 +117,7 @@ numberOfDataValues
 *)
 Begin["Private`"] (* Begin Private Context *) 
 
+myCAssign[lhs_:"",expr_?(!OptionQ[#]&),opts___?OptionQ]:=ToString[CAssign[lhs,expr,Flatten[{opts}]]]
 
 allNames[modelEquations_]:=Flatten[findVarsParams[modelEquations]]//.xx_[_]->xx
 (*
@@ -489,9 +495,9 @@ Print["sparseFunctionAssignments"];
 genAIAJAAssn[modelEquations_List,
 modelCSRMatrix:{theA_?VectorQ,theIA_?VectorQ,theJA_?VectorQ}]:=
 With[{sfa=SFAAssign[modelEquations,theA],
-sfIA=CAssign[iaMat,theIA,
+sfIA=myCAssign[iaMat,theIA,AssignEnd->";\n",
 AssignOptimize->True,OptimizationSymbol -> okay],
-sfJA=CAssign[jaMat,theJA,
+sfJA=myCAssign[jaMat,theJA,AssignEnd->";\n",
 AssignOptimize->True,OptimizationSymbol -> okay]},
 With[{opVarDefs=genDefines[sfa]},
 {sfa,opVarDefs,sfIA,sfJA}]]
@@ -561,7 +567,7 @@ numbExog=Length[modelExogenous[modelEquations]];
 modelColumns=Abs[ll[[1]]]+ll[[-1]] +1;
 Print["periodicPointGuesserAssignments"];
 periodPointGuesserAssignments=
-CAssign[guessVector[timeOffset],modelFpGuess[modelEquations],
+myCAssign[guessVector[timeOffset],modelFpGuess[modelEquations],
 AssignToArray->{guessVector}]; 
 Print["sparseFunctionAssignments"];
 {sparseFunctionAssignmentsA,opVarDefsSFA,
@@ -600,32 +606,32 @@ If[modelUpsilonEqns[modelEquations]=={},denseToSparseMat[{{1}}],
 refSpdrvs[
 Through[modelExogenous[modelEquations][t]]/.Flatten[Solve[Thread[modelUpsilonEqns[modelEquations]==0]
 ,Through[modelExogenous[modelEquations][t]]]], modelEquations]];
-upsilonMatA=CAssign[
+upsilonMatA=myCAssign[
 aMat,upsilonMatrix[[1]],AssignOptimize->True,OptimizationSymbol ->
 okay];
-upsilonMatIA= CAssign[
+upsilonMatIA= myCAssign[
 iaMat,upsilonMatrix[[3]],AssignOptimize->True,OptimizationSymbol ->
 okay];
-upsilonMatJA= CAssign[
+upsilonMatJA= myCAssign[
 jaMat,upsilonMatrix[[2]],AssignOptimize->True,OptimizationSymbol ->
 okay];
 exogHMatrix=
 If[modelUpsilonEqns[modelEquations]=={},denseToSparseMat[{{1}}],
-notSpdrvs[modelEquations]]//.timeSubs; exogHMatA=CAssign[
+notSpdrvs[modelEquations]]//.timeSubs; exogHMatA=myCAssign[
 aMat,exogHMatrix[[1]],AssignOptimize->True,OptimizationSymbol -> okay]; exogHMatIA=
-CAssign[ iaMat,exogHMatrix[[3]],AssignOptimize->True,OptimizationSymbol
+myCAssign[ iaMat,exogHMatrix[[3]],AssignOptimize->True,OptimizationSymbol
 -> okay];
-exogHMatJA= CAssign[
+exogHMatJA= myCAssign[
 jaMat,exogHMatrix[[2]],AssignOptimize->True,OptimizationSymbol -> okay];
 selectZMatrix={Table[1,{numbExog}],
 Flatten[Position[bothExogEndog[modelEquations],#]& /@
-justExog[modelEquations]], Range[numbExog+1]}; selectZMatA=CAssign[
+justExog[modelEquations]], Range[numbExog+1]}; selectZMatA=myCAssign[
 aMat,selectZMatrix[[1]],AssignOptimize->True,OptimizationSymbol ->
 okay];
-selectZMatIA= CAssign[
+selectZMatIA= myCAssign[
 iaMat,selectZMatrix[[3]],AssignOptimize->True,OptimizationSymbol ->
 okay];
-selectZMatJA= CAssign[
+selectZMatJA= myCAssign[
 jaMat,selectZMatrix[[2]],AssignOptimize->True,OptimizationSymbol ->
 okay];
 defaultParams=N[Flatten[
@@ -677,9 +683,9 @@ RegularExpression["okay[0-9]+"]]},
 
 SFAAssign[modelEquations_List,mMatrix_List]:=
 With[{sReps=defArgsToIntsRepStrngs[endog[modelEquations]]},
-With[{csn=CAssign[
+With[{csn=myCAssign[
 aMat,mMatrix,AssignEnd->";\n",AssignOptimize->True,OptimizationSymbol -> okay]},
-StringReplace[StringJoin @@(csn[[1,1]]),sReps]]];
+StringReplace[(csn),sReps]]];
 
 defArgsToIntsRepStrngs[varSymbs:{_Symbol...}]:=
 With[{asStrs=ToString/@varSymbs},
@@ -883,40 +889,40 @@ runItInv=FileNameJoin[{mmaMcFilesDir,"runItInvariantLocalDefs.h"}];
 runItOth=FileNameJoin[{mmaMcFilesDir,"runItOther.h"}];
 spaceForTempVars=spaceForTemp[modelEquations];
 periodPointGuesserAssignments=
-CAssign[guessVector[timeOffset],modelFpGuess[modelEquations],
+myCAssign[guessVector[timeOffset],modelFpGuess[modelEquations],
 AssignToArray->{guessVector}];
 upsilonMatrix=
 If[modelUpsilonEqns[modelEquations]=={},denseToSparseMat[{{1}}],
 refSpdrvs[
 Through[modelExogenous[modelEquations][t]]/.Flatten[Solve[Thread[modelUpsilonEqns[modelEquations]==0]
 ,Through[modelExogenous[modelEquations][t]]]], modelEquations]];
-upsilonMatA=CAssign[
+upsilonMatA=myCAssign[
 aMat,upsilonMatrix[[1]],AssignOptimize->True,OptimizationSymbol ->
 okay];
-upsilonMatIA= CAssign[
+upsilonMatIA= myCAssign[
 iaMat,upsilonMatrix[[3]],AssignOptimize->True,OptimizationSymbol ->
 okay];
-upsilonMatJA= CAssign[
+upsilonMatJA= myCAssign[
 jaMat,upsilonMatrix[[2]],AssignOptimize->True,OptimizationSymbol ->
 okay];
 exogHMatrix=
 If[modelUpsilonEqns[modelEquations]=={},denseToSparseMat[{{1}}],
-notSpdrvs[modelEquations]]//.timeSubs; exogHMatA=CAssign[
+notSpdrvs[modelEquations]]//.timeSubs; exogHMatA=myCAssign[
 aMat,exogHMatrix[[1]],AssignOptimize->True,OptimizationSymbol -> okay]; exogHMatIA=
-CAssign[ iaMat,exogHMatrix[[3]],AssignOptimize->True,OptimizationSymbol
+myCAssign[ iaMat,exogHMatrix[[3]],AssignOptimize->True,OptimizationSymbol
 -> okay];
-exogHMatJA= CAssign[
+exogHMatJA= myCAssign[
 jaMat,exogHMatrix[[2]],AssignOptimize->True,OptimizationSymbol -> okay];
 numbExog=Length[modelExogenous[modelEquations]];
 selectZMatrix={Table[1,{numbExog}],
 Flatten[Position[bothExogEndog[modelEquations],#]& /@
-justExog[modelEquations]], Range[numbExog+1]}; selectZMatA=CAssign[
+justExog[modelEquations]], Range[numbExog+1]}; selectZMatA=myCAssign[
 aMat,selectZMatrix[[1]],AssignOptimize->True,OptimizationSymbol ->
 okay];
-selectZMatIA= CAssign[
+selectZMatIA= myCAssign[
 iaMat,selectZMatrix[[3]],AssignOptimize->True,OptimizationSymbol ->
 okay];
-selectZMatJA= CAssign[
+selectZMatJA= myCAssign[
 jaMat,selectZMatrix[[2]],AssignOptimize->True,OptimizationSymbol ->
 okay];
 vstr=StringReplace[ToString[InputForm[N[Flatten[modelData[modelEquations]]]]],{"*^-"->"e-"}];
