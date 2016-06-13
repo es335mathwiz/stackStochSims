@@ -490,9 +490,9 @@ genAIAJAAssn[modelEquations_List,
 modelCSRMatrix:{theA_?VectorQ,theIA_?VectorQ,theJA_?VectorQ}]:=
 With[{sfa=SFAAssign[modelEquations,theA],
 sfIA=CAssign[iaMat,theIA,
-AssignOptimize->True,OptimizationSymbol -> okay,FormatType->OutputForm],
+AssignOptimize->True,OptimizationSymbol -> okay],
 sfJA=CAssign[jaMat,theJA,
-AssignOptimize->True,OptimizationSymbol -> okay,FormatType->OutputForm]},
+AssignOptimize->True,OptimizationSymbol -> okay]},
 With[{opVarDefs=genDefines[sfa]},
 {sfa,opVarDefs,sfIA,sfJA}]]
 
@@ -602,32 +602,32 @@ Through[modelExogenous[modelEquations][t]]/.Flatten[Solve[Thread[modelUpsilonEqn
 ,Through[modelExogenous[modelEquations][t]]]], modelEquations]];
 upsilonMatA=CAssign[
 aMat,upsilonMatrix[[1]],AssignOptimize->True,OptimizationSymbol ->
-okay,FormatType->OutputForm];
+okay];
 upsilonMatIA= CAssign[
 iaMat,upsilonMatrix[[3]],AssignOptimize->True,OptimizationSymbol ->
-okay,FormatType->OutputForm];
+okay];
 upsilonMatJA= CAssign[
 jaMat,upsilonMatrix[[2]],AssignOptimize->True,OptimizationSymbol ->
-okay,FormatType->OutputForm];
+okay];
 exogHMatrix=
 If[modelUpsilonEqns[modelEquations]=={},denseToSparseMat[{{1}}],
 notSpdrvs[modelEquations]]//.timeSubs; exogHMatA=CAssign[
-aMat,exogHMatrix[[1]],AssignOptimize->True,OptimizationSymbol -> okay,FormatType->OutputForm]; exogHMatIA=
+aMat,exogHMatrix[[1]],AssignOptimize->True,OptimizationSymbol -> okay]; exogHMatIA=
 CAssign[ iaMat,exogHMatrix[[3]],AssignOptimize->True,OptimizationSymbol
--> okay,FormatType->OutputForm];
+-> okay];
 exogHMatJA= CAssign[
-jaMat,exogHMatrix[[2]],AssignOptimize->True,OptimizationSymbol -> okay,FormatType->OutputForm];
+jaMat,exogHMatrix[[2]],AssignOptimize->True,OptimizationSymbol -> okay];
 selectZMatrix={Table[1,{numbExog}],
 Flatten[Position[bothExogEndog[modelEquations],#]& /@
 justExog[modelEquations]], Range[numbExog+1]}; selectZMatA=CAssign[
 aMat,selectZMatrix[[1]],AssignOptimize->True,OptimizationSymbol ->
-okay,FormatType->OutputForm];
+okay];
 selectZMatIA= CAssign[
 iaMat,selectZMatrix[[3]],AssignOptimize->True,OptimizationSymbol ->
-okay,FormatType->OutputForm];
+okay];
 selectZMatJA= CAssign[
 jaMat,selectZMatrix[[2]],AssignOptimize->True,OptimizationSymbol ->
-okay,FormatType->OutputForm];
+okay];
 defaultParams=N[Flatten[
 modelDefaultParameters[modelEquations]]];
 numParams=Length[Flatten[
@@ -640,34 +640,34 @@ valsInfo=modelDataInfo[modelEquations]; Print["shocks"];
 dvalsInfo=modelShocksInfo[modelEquations];
 dstr=StringReplace[ToString[InputForm[N[Flatten[modelShocks[modelEquations]]]]],{"*^-"->"e-"}];
 Print["splicing mmaToC.mc"];
-Splice[mmaMcFilesDir<>"/mmaToC.mc",outFile<>".c",FormatType->OutputForm,
+Splice[mmaMcFilesDir<>"/mmaToC.mc",outFile<>".c",
 PageWidth->Infinity(*Max[100000,(11/10)*Rows*dataCols]*)];
 Print["splicing mmaToCDrv.mc"];
-Splice[mmaMcFilesDir<>"/mmaToCDrv.mc",outFile<>"Drv.c",FormatType->OutputForm,
+Splice[mmaMcFilesDir<>"/mmaToCDrv.mc",outFile<>"Drv.c",
 PageWidth->Infinity(*Max[100000,(11/10)*dataRows*dataCols]*)];
 Print["splicing mmaToCSupport.mc"];
 lngendg=bothExogEndog[modelEquations]; exg=justExog[modelEquations];
 exogPos=Flatten[Position[lngendg,#]& /@ exg];
 exogQ=Table[0,{Length[lngendg]}]; exogQ[[exogPos]]=1;
-Splice[mmaMcFilesDir<>"/mmaToCSupport.mc",outFile<>"Support.c",FormatType->OutputForm,
+Splice[mmaMcFilesDir<>"/mmaToCSupport.mc",outFile<>"Support.c",
 PageWidth->Infinity(*Max[100000,(11/10)*dataRows*dataCols]*)];
 Print["splicing mmaToCData.mc"];
-Splice[mmaMcFilesDir<>"/mmaToCData.mc",outFile<>"Data.c",FormatType->OutputForm,
+Splice[mmaMcFilesDir<>"/mmaToCData.mc",outFile<>"Data.c",
 PageWidth->Infinity(*Max[100000,(11/10)*dataRows*dataCols]*)];
 Print["splicing mmaToCShocks.mc"];
-Splice[mmaMcFilesDir<>"/mmaToCShocks.mc",outFile<>"Shocks.c",FormatType->OutputForm,
+Splice[mmaMcFilesDir<>"/mmaToCShocks.mc",outFile<>"Shocks.c",
 PageWidth->Infinity(*Max[100000,(11/10)*dataRows*dataCols]*)];
 Print["splicing runIt.mc"]; Splice[mmaMcFilesDir<>"/runIt.mc","run" <>
-outFile<>".c",FormatType->OutputForm,PageWidth->Infinity];
+outFile<>".c",PageWidth->Infinity];
 Print["splicing mpiRunIt.mc"];
 Splice[mmaMcFilesDir<>"/mpiRunIt.mc","mpirun" <>
-outFile<>".c",FormatType->OutputForm,PageWidth->Infinity];
+outFile<>".c",PageWidth->Infinity];
 Print["splicing makeFl.mc"];
-Splice[mmaMcFilesDir<>"/makeFl.mc","make"<>outFile,FormatType->OutputForm,PageWidth->Infinity];
-Splice[mmaMcFilesDir<>"/runItLocalDefs.mc","run"<>outFile<>"LocalDefs.h",FormatType->OutputForm,PageWidth->Infinity];
-Splice[mmaMcFilesDir<>"/mmaToCDataInclude.mc",outFile<>"DataForInclude.h",FormatType->OutputForm,
+Splice[mmaMcFilesDir<>"/makeFl.mc","make"<>outFile,PageWidth->Infinity];
+Splice[mmaMcFilesDir<>"/runItLocalDefs.mc","run"<>outFile<>"LocalDefs.h",PageWidth->Infinity];
+Splice[mmaMcFilesDir<>"/mmaToCDataInclude.mc",outFile<>"DataForInclude.h",
 PageWidth->Infinity(*Max[100000,(11/10)*dataRows*dataCols]*)];
-Splice[mmaMcFilesDir<>"/mmaToCShockInclude.mc",outFile<>"ShocksForInclude.h",FormatType->OutputForm,
+Splice[mmaMcFilesDir<>"/mmaToCShockInclude.mc",outFile<>"ShocksForInclude.h",
 PageWidth->Infinity(*Max[100000,(11/10)*dataRows*dataCols]*)]; ];
 
 genDefines[theEqStr_String]:=
@@ -678,7 +678,7 @@ RegularExpression["okay[0-9]+"]]},
 SFAAssign[modelEquations_List,mMatrix_List]:=
 With[{sReps=defArgsToIntsRepStrngs[endog[modelEquations]]},
 With[{csn=CAssign[
-aMat,mMatrix,AssignEnd->";\n",AssignOptimize->True,OptimizationSymbol -> okay,FormatType->OutputForm]},
+aMat,mMatrix,AssignEnd->";\n",AssignOptimize->True,OptimizationSymbol -> okay]},
 StringReplace[StringJoin @@(csn[[1,1]]),sReps]]];
 
 defArgsToIntsRepStrngs[varSymbs:{_Symbol...}]:=
@@ -699,11 +699,11 @@ valsInfo=modelDataInfo[modelEquations];
 dvalsInfo=modelShocksInfo[modelEquations];
 dstr=StringReplace[ToString[InputForm[N[Flatten[modelShocks[modelEquations]]]]],{"*^-"->"e-"}];
 Print["splicing mmaToCData.mc"];
-Splice[mmaMcFilesDir<>"/mmaToCData.mc",outFile<>"Data.c",FormatType->OutputForm,
+Splice[mmaMcFilesDir<>"/mmaToCData.mc",outFile<>"Data.c",
 	PageWidth->Infinity(*Max[100000,(11/10)*dataRows*dataCols]*)];
-Splice[mmaMcFilesDir<>"/mmaToCShockInclude.mc",outFile<>"ShocksForInclude.h",FormatType->OutputForm,
+Splice[mmaMcFilesDir<>"/mmaToCShockInclude.mc",outFile<>"ShocksForInclude.h",
 	PageWidth->Infinity(*Max[100000,(11/10)*dataRows*dataCols]*)];
-Splice[mmaMcFilesDir<>"/mmaToCDataInclude.mc",outFile<>"DataForInclude.h",FormatType->OutputForm,
+Splice[mmaMcFilesDir<>"/mmaToCDataInclude.mc",outFile<>"DataForInclude.h",
 	PageWidth->Infinity(*Max[100000,(11/10)*dataRows*dataCols]*)];
 ];
 Print["done reading MmaModelToC.m"]
@@ -892,33 +892,33 @@ Through[modelExogenous[modelEquations][t]]/.Flatten[Solve[Thread[modelUpsilonEqn
 ,Through[modelExogenous[modelEquations][t]]]], modelEquations]];
 upsilonMatA=CAssign[
 aMat,upsilonMatrix[[1]],AssignOptimize->True,OptimizationSymbol ->
-okay,FormatType->OutputForm];
+okay];
 upsilonMatIA= CAssign[
 iaMat,upsilonMatrix[[3]],AssignOptimize->True,OptimizationSymbol ->
-okay,FormatType->OutputForm];
+okay];
 upsilonMatJA= CAssign[
 jaMat,upsilonMatrix[[2]],AssignOptimize->True,OptimizationSymbol ->
-okay,FormatType->OutputForm];
+okay];
 exogHMatrix=
 If[modelUpsilonEqns[modelEquations]=={},denseToSparseMat[{{1}}],
 notSpdrvs[modelEquations]]//.timeSubs; exogHMatA=CAssign[
-aMat,exogHMatrix[[1]],AssignOptimize->True,OptimizationSymbol -> okay,FormatType->OutputForm]; exogHMatIA=
+aMat,exogHMatrix[[1]],AssignOptimize->True,OptimizationSymbol -> okay]; exogHMatIA=
 CAssign[ iaMat,exogHMatrix[[3]],AssignOptimize->True,OptimizationSymbol
--> okay,FormatType->OutputForm];
+-> okay];
 exogHMatJA= CAssign[
-jaMat,exogHMatrix[[2]],AssignOptimize->True,OptimizationSymbol -> okay,FormatType->OutputForm];
+jaMat,exogHMatrix[[2]],AssignOptimize->True,OptimizationSymbol -> okay];
 numbExog=Length[modelExogenous[modelEquations]];
 selectZMatrix={Table[1,{numbExog}],
 Flatten[Position[bothExogEndog[modelEquations],#]& /@
 justExog[modelEquations]], Range[numbExog+1]}; selectZMatA=CAssign[
 aMat,selectZMatrix[[1]],AssignOptimize->True,OptimizationSymbol ->
-okay,FormatType->OutputForm];
+okay];
 selectZMatIA= CAssign[
 iaMat,selectZMatrix[[3]],AssignOptimize->True,OptimizationSymbol ->
-okay,FormatType->OutputForm];
+okay];
 selectZMatJA= CAssign[
 jaMat,selectZMatrix[[2]],AssignOptimize->True,OptimizationSymbol ->
-okay,FormatType->OutputForm];
+okay];
 vstr=StringReplace[ToString[InputForm[N[Flatten[modelData[modelEquations]]]]],{"*^-"->"e-"}];
 dvalsInfo=modelShocksInfo[modelEquations];
 dstr=StringReplace[ToString[InputForm[N[Flatten[modelShocks[modelEquations]]]]],{"*^-"->"e-"}];
