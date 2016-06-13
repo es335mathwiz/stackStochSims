@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model>
+  <name>rbc</name>
+  <xml_version>1.0</xml_version>
+  <variable>
+    <name>cc</name>
+    <standard_equation>
+      <dynare_equation>
+1/cc^(-1) - cc_aerr = (y_cc(1)*y_cc(2)*kk^(-1 + y_cc(1))*theta(1))/cc(1)
+</dynare_equation>
+      <coeff>
+        <cf_name>y_cc(1)</cf_name>
+        <cf_value>0.36</cf_value>
+      </coeff>
+      <coeff>
+        <cf_name>y_cc(2)</cf_name>
+        <cf_value>0.95</cf_value>
+      </coeff>
+    </standard_equation>
+  </variable>
+  <variable>
+    <name>kk</name>
+    <standard_equation>
+      <dynare_equation>
+ kk   -  kk_aerr = - cc + kk(-1)^y_kk(1)*theta
+</dynare_equation>
+      <coeff>
+        <cf_name>y_kk(1)</cf_name>
+        <cf_value>0.36</cf_value>
+      </coeff>
+    </standard_equation>
+  </variable>
+  <variable>
+    <name>theta</name>
+    <standard_equation>
+      <dynare_equation>
+theta - theta_aerr = -exp(y_theta(1)*log(theta(-1)))
+</dynare_equation>
+      <coeff>
+        <cf_name>y_theta(1)</cf_name> 
+        <cf_value>0.95</cf_value>
+      </coeff>
+    </standard_equation>
+  </variable>
+  <variable>
+    <name>aDummy</name>
+  </variable>
+</model>
