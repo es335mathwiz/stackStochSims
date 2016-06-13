@@ -20,6 +20,8 @@ iaMat::usage="for splicing"
 jaMat::usage="for splicing"
 tPaOne::usage="for splicing"
 tMaOne::usage="for splicing"
+guessVector::usage="forsplicing"
+timeOffset::usage="forsplicing"
 (*
 mmaToCTemplate::usage="to gen c file"
 drib::usage="package top"
@@ -89,8 +91,6 @@ selectZMatA::usage="for splicing"
 selectZMatIA::usage="for splicing"
 selectZMatJA::usage="for splicing"
 periodPointGuesserAssignments::usage="for splicing"
-guessVector::usage="forsplicing"
-timeOffset::usage="forsplicing"
 numberOfParameters::usage="forsplicing"
 vstr::usage="forsplicing"
 dataCols::usage="for splicing"
@@ -129,12 +129,12 @@ mmaMcFilesDir=FileNameJoin[Drop[FileNameSplit[FindFile["MmaModelToC`"]], -1]];
 lagLeadLoc=FileNameJoin[{mmaMcFilesDir,"lagLead.h"}]
 $runItExt=FileNameJoin[{mmaMcFilesDir,"runItExternalDefs.h"}]
 $runItInv=FileNameJoin[{mmaMcFilesDir,"runItInvariantLocalDefs.h"}]
+$runItOth=FileNameJoin[{mmaMcFilesDir,"runItOther.h"}]
+$runoutFileStringLocalDefsLoc=FileNameJoin[{mmaMcFilesDir,"runoutFileStringLocalDefs.h"}]
 (*
 $runItExternalDefsLoc=FileNameJoin[{mmaMcFilesDir,"runItExternalDefs.h"}]
 $runItInvariantLocalDefsLoc=FileNameJoin[{mmaMcFilesDir,"runItInvariantLocalDefs.h"}]
 *)
-$runItOth=FileNameJoin[{mmaMcFilesDir,"runItOther.h"}]
-$runoutFileStringLocalDefsLoc=FileNameJoin[{mmaMcFilesDir,"runoutFileStringLocalDefs.h"}]
 Off[General::spell,General::spell1];
 SetOptions[$Output,PageWidth->73];
 Print["before reading Format and Optimize"]
@@ -628,8 +628,9 @@ okay,FormatType->OutputForm];
 selectZMatJA= CAssign[
 jaMat,selectZMatrix[[2]],AssignOptimize->True,OptimizationSymbol ->
 okay,FormatType->OutputForm];
-defaultParams=InputForm[N[Flatten[
-modelDefaultParameters[modelEquations]]]]; numParams=Length[Flatten[
+defaultParams=N[Flatten[
+modelDefaultParameters[modelEquations]]];
+numParams=Length[Flatten[
 modelDefaultParameters[modelEquations]]];
 fpGuessVec=modelFpGuess[modelEquations]; Print["data"];
 {dataRows,dataCols}=Dimensions[modelData[modelEquations]];(*Print[{dataRows,dataCols}];Print["huh",modelData[modelEquations]];*)
@@ -721,7 +722,8 @@ chkDelete[modName<>"Drv.c"];writeModelDotCDrv[modName,aList];
 chkDelete[modName<>"Makefile"];writeMakefile[modName,aList];
 chkDelete["mpirun"<>modName<>".c"];writeMPIRun[modName,aList];
 chkDelete[modName<>"DataForInclude.h"];writeDataInclude[modName,aList];
-chkDelete[modName<>"ShocksForInclude.jh"];writeShocksInclude[modName,aList];
+chkDelete[modName<>"Shocks.c"];writeShocks[modName,aList];
+chkDelete[modName<>"ShocksForInclude.h"];writeShocksInclude[modName,aList];
 chkDelete["run"<>modName<>"LocalDefs.h"];writeRunLocalDefs[modName,aList];
 chkDelete[modName<>"Data.c"];writeData[modName,aList];
 chkDelete["run"<>modName<>".c"];writeRun[modName,aList];
@@ -810,7 +812,7 @@ With[{modelMatrix=denseColToSparseMat[Join[modelEquations(*/.funcSubs*),
 Table[0,{Length[modelExogenous[modelEquations]]}]]]//.timeSubs,
 linModelMatrix=denseColToSparseMat[linModel]//.timeSubs,
 nlinModelMatrix=denseColToSparseMat[nlinPartModel]//.timeSubs},
-Module[{modelColumns,
+Module[{modelColumns,theNamesArray,theParamNamesArray,
 sparseFunctionAssignmentsA,opVarDefsSFA,
 sparseFunctionAssignmentsIA,
 sparseFunctionAssignmentsJA,
@@ -829,8 +831,16 @@ linSparseFunctionDerivativeAssignmentsJA,
 nlinSparseFunctionDerivativeAssignmentsA,opNLinVarDefsDrvSFA,
 nlinSparseFunctionDerivativeAssignmentsIA,
 nlinSparseFunctionDerivativeAssignmentsJA},
-theNamesArray=("\""<>ToString[#]<>"\"")& /@ allVars[modelEquations];
+lngendg=bothExogEndog[modelEquations];
+exg=justExog[modelEquations];
+exogPos=Flatten[Position[lngendg,#]& /@ exg];
+exogQ=Table[0,{Length[lngendg]}];
+exogQ[[exogPos]]=1;
+theNamesArray=Union[("\""<>ToString[Head[#]]<>"\"")& /@ allVars[modelEquations]];
 theParamNamesArray=("\""<>ToString[#]<>"\"")& /@ coeffs[modelEquations];
+numberOfParameters=Length[coeffs[modelEquations]];
+{dataRows,dataCols}=Dimensions[modelData[modelEquations]];
+{shocksRows,shocksCols}=Dimensions[modelShocks[modelEquations]];
 {sparseFunctionAssignmentsA,opVarDefsSFA,
 sparseFunctionAssignmentsIA,
 sparseFunctionAssignmentsJA}=
@@ -859,8 +869,60 @@ ll=lagsLeads[modelEquations];
 lags=-ll[[1]];
 leads=ll[[-1]];
 modelColumns=Abs[ll[[1]]]+ll[[-1]] +1;
-With[{neq=Length[Union[endog[modelEquations],modelExogenous[modelEquations]]],
-	numbExog=Length[modelExogenous[modelEquations]]},
+defaultParams=N[Flatten[
+modelDefaultParameters[modelEquations]]];
+numParams=Length[Flatten[
+modelDefaultParameters[modelEquations]]];
+endg=endog[modelEquations];
+allv=Union[exg,endg];
+allcoeffs=coeffs[modelEquations];
+theAllv=ToString /@ allv;
+theAllCoeffs=ToString /@ allcoeffs;
+runItExt=FileNameJoin[{mmaMcFilesDir,"runItExternalDefs.h"}];
+runItInv=FileNameJoin[{mmaMcFilesDir,"runItInvariantLocalDefs.h"}];
+runItOth=FileNameJoin[{mmaMcFilesDir,"runItOther.h"}];
+spaceForTempVars=spaceForTemp[modelEquations];
+periodPointGuesserAssignments=
+CAssign[guessVector[timeOffset],modelFpGuess[modelEquations],
+AssignToArray->{guessVector}];
+upsilonMatrix=
+If[modelUpsilonEqns[modelEquations]=={},denseToSparseMat[{{1}}],
+refSpdrvs[
+Through[modelExogenous[modelEquations][t]]/.Flatten[Solve[Thread[modelUpsilonEqns[modelEquations]==0]
+,Through[modelExogenous[modelEquations][t]]]], modelEquations]];
+upsilonMatA=CAssign[
+aMat,upsilonMatrix[[1]],AssignOptimize->True,OptimizationSymbol ->
+okay,FormatType->OutputForm];
+upsilonMatIA= CAssign[
+iaMat,upsilonMatrix[[3]],AssignOptimize->True,OptimizationSymbol ->
+okay,FormatType->OutputForm];
+upsilonMatJA= CAssign[
+jaMat,upsilonMatrix[[2]],AssignOptimize->True,OptimizationSymbol ->
+okay,FormatType->OutputForm];
+exogHMatrix=
+If[modelUpsilonEqns[modelEquations]=={},denseToSparseMat[{{1}}],
+notSpdrvs[modelEquations]]//.timeSubs; exogHMatA=CAssign[
+aMat,exogHMatrix[[1]],AssignOptimize->True,OptimizationSymbol -> okay,FormatType->OutputForm]; exogHMatIA=
+CAssign[ iaMat,exogHMatrix[[3]],AssignOptimize->True,OptimizationSymbol
+-> okay,FormatType->OutputForm];
+exogHMatJA= CAssign[
+jaMat,exogHMatrix[[2]],AssignOptimize->True,OptimizationSymbol -> okay,FormatType->OutputForm];
+numbExog=Length[modelExogenous[modelEquations]];
+selectZMatrix={Table[1,{numbExog}],
+Flatten[Position[bothExogEndog[modelEquations],#]& /@
+justExog[modelEquations]], Range[numbExog+1]}; selectZMatA=CAssign[
+aMat,selectZMatrix[[1]],AssignOptimize->True,OptimizationSymbol ->
+okay,FormatType->OutputForm];
+selectZMatIA= CAssign[
+iaMat,selectZMatrix[[3]],AssignOptimize->True,OptimizationSymbol ->
+okay,FormatType->OutputForm];
+selectZMatJA= CAssign[
+jaMat,selectZMatrix[[2]],AssignOptimize->True,OptimizationSymbol ->
+okay,FormatType->OutputForm];
+vstr=StringReplace[ToString[InputForm[N[Flatten[modelData[modelEquations]]]]],{"*^-"->"e-"}];
+dvalsInfo=modelShocksInfo[modelEquations];
+dstr=StringReplace[ToString[InputForm[N[Flatten[modelShocks[modelEquations]]]]],{"*^-"->"e-"}];
+With[{neq=Length[Union[endog[modelEquations],modelExogenous[modelEquations]]]},
 <|"date"->Date[],
 "modelCreationInfo"->modelInfo[modelEquations],
 "lagLeadLoc"->FileNameJoin[{mmaMcFilesDir,"lagLead.h"}],
@@ -883,6 +945,7 @@ With[{neq=Length[Union[endog[modelEquations],modelExogenous[modelEquations]]],
 "nlinSparseFunctionAssignmentsIA"->nlinSparseFunctionAssignmentsIA,
 "nlinSparseFunctionAssignmentsJA"->nlinSparseFunctionAssignmentsJA,
 "bLength"->Length[modelSparseDrvs[[1]]],
+"opVarDefsDrvSFA"->opVarDefsDrvSFA,
 "sparseFunctionDerivativeAssignmentsA"->sparseFunctionDerivativeAssignmentsA,
 "sparseFunctionDerivativeAssignmentsIA"->sparseFunctionDerivativeAssignmentsIA,
 "sparseFunctionDerivativeAssignmentsJA"->sparseFunctionDerivativeAssignmentsJA,
@@ -897,7 +960,36 @@ With[{neq=Length[Union[endog[modelEquations],modelExogenous[modelEquations]]],
 "outFile"->outRoot,
 "modelColumns"->modelColumns,
 "lags"->lags,
-"leads"->leads
+"leads"->leads,
+"theNamesArray"->theNamesArray,
+"theParamNamesArray"->theParamNamesArray,
+"numParams"->numParams,
+"defaultParams"->defaultParams,
+"exogQ"->exogQ,
+"theAllv"->theAllv,
+"theAllCoeffs"->theAllCoeffs,
+"runItExt"->runItExt,
+"runItInv"->runItInv,
+"runItOth"->runItOth,
+"numberOfParameters"->numberOfParameters,
+"shocksRows"->shocksRows,
+"shocksCols"->shocksCols,
+"dataRows"->dataRows,
+"dataCols"->dataCols,
+"spaceForTempVars"->spaceForTempVars,
+"periodPointGuesserAssignments"->periodPointGuesserAssignments,
+"upsilonMatA"->upsilonMatA,
+"upsilonMatIA"->upsilonMatIA,
+"upsilonMatJA"->upsilonMatJA,
+"exogHMatA"->exogHMatA,
+"exogHMatIA"->exogHMatIA,
+"exogHMatJA"->exogHMatJA,
+"selectZMatA"->selectZMatA,
+"selectZMatIA"->selectZMatIA,
+"selectZMatJA"->selectZMatJA,
+"vstr"->vstr,
+"dvalsInfo"->"dvalsInfo",
+"dstr"->dstr
 |>]]]]]
 
 
@@ -1665,6 +1757,23 @@ static double theShocks[`shocksRows`][`shocksCols`]=
 
 
 "
+writeShocks[outFile_String,aList_Association]:=
+WriteString[outFile<>"Shocks.c",
+	TemplateApply[shocksTemplate,aList]]
+
+shocksTemplate=
+"
+/*`dvalsInfo`*/
+void `functionName`Shocks(int t,double * vectorOfVals)
+{
+int i;
+#include \"`outFile`ShocksForInclude.h\"/*dstr;*/
+for(i=0;i<`shocksCols`;i++)vectorOfVals[i]=0;
+for(i=0;i<`modelNumberOfEquations`-`numbExog`;i++)vectorOfVals[i]=theShocks[t][i];
+}
+
+
+"
 
 writeRunLocalDefs[outFile_String,aList_Association]:=
 WriteString["run"<>outFile<>"LocalDefs.h",
@@ -1717,7 +1826,7 @@ double * `functionName`ZeroPathQ;
 
 writeData[outFile_String,aList_Association]:=
 WriteString[outFile<>"Data.c",
-	TemplateApply[mpiRunTemplate,aList]]
+	TemplateApply[dataTemplate,aList]]
 
 dataTemplate=
 "
@@ -1728,7 +1837,7 @@ dataTemplate=
 void `functionName`Data(int t,double * vectorOfVals)
 {
 int i;
-#include  \"`outFileString <> \"DataForInclude.h\"`\"/*vstr;*/
+#include  \"`outFile`DataForInclude.h\"/*vstr;*/
 for(i=0;i<`dataCols`;i++)vectorOfVals[i]=theData[t][i];
 }
 
@@ -1736,7 +1845,7 @@ for(i=0;i<`dataCols`;i++)vectorOfVals[i]=theData[t][i];
 
 writeRun[outFile_String,aList_Association]:=
 WriteString["run"<>outFile<>".c",
-	TemplateApply[mpiRunTemplate,aList]]
+	TemplateApply[runItTemplate,aList]]
 
 runItTemplate=
 "
@@ -1746,15 +1855,15 @@ runItTemplate=
 /*Mathematica Creation Date`date`*/
 /*`modelCreationInfo`*/
 #include <stdlib.h>
-#include \"`$runItExt`\"
+#include \"`runItExt`\"
 
 
 
 #define PATHLENGTH 1000
 
 int numberOfEquations=`modelNumberOfEquations`;
-char * namesArray[] =  `InputForm[ToString /@ allv]`;
-char * paramNamesArray[] = `InputForm[ToString /@ allcoeffs]`;;
+char * namesArray[] =  `theNamesArray`;
+char * paramNamesArray[] = `theParamNamesArray`;
 int numberOfParameters=`numberOfParameters`;
 int * parameters[]={};
 int numDATA=`dataRows`;
@@ -1763,9 +1872,9 @@ double * theData;
 
 main(int argc, char * argv[])
 {
-#include \"`$runItInv`\"
-#include \"run`outFileString`LocalDefs.h\"
-printf(\"$Id: runIt.mc, 2016 m1gsa00 $\n\");
+#include \"`runItInv`\"
+#include \"run`outFile`LocalDefs.h\"
+printf(\" runIt.mc, 2016 m1gsa00 \\n\");
 
 `functionName`DataVals=(double *)calloc(numberOfEquations*numDATA,sizeof(double));
 for(i=0;i<numDATA;i++){rbcExampleData(i,`functionName`DataVals+(i*numberOfEquations));}
@@ -1794,7 +1903,7 @@ failedQ);
 */
 }
 
-#include \"`$runItOth`\"
+#include \"`runItOth`\"
 
 /*
 printf(\"generating perm vec\n\");
