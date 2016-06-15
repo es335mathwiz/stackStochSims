@@ -1,5 +1,5 @@
 (*
-cd ~;mkdir oneBelowHome;cd oneBelowHome
+cd ~;mkdir someDir;cd someDir
 to make sparseAMA stackC and stochSims code
 git clone https://github.com/es335mathwiz/sparseAMA.git
 git clone https://github.com/es335mathwiz/CStochSims.git
@@ -9,6 +9,10 @@ export MAVEN_OPTS="-Xms64m -Xmx64m"
 mvn clean install
 cd ../CStochSims
 make -f makeStochTry debStochRun
+make -f makeStochTry stochRun
+
+to make code generation and toggle code return to someDir
+cd ..
 git clone https://github.com/es335mathwiz/stackStochSims.git
 git clone https://github.com/es335mathwiz/AccelerateAMA.git
 git clone https://github.com/es335mathwiz/ProtectedSymbols.git
@@ -16,6 +20,12 @@ git clone https://github.com/es335mathwiz/mathAMA.git
 cd stackStochSims
 math  run version 10
 Get["fixSplice.m"]
+Quit
+
+gmake -f muddyMakefile debrunmuddy
+export LD_LIBRARY_PATH=../sparseAMA/target/nar/sparseAMA-1.0-SNAPSHOT-amd64-Linux-g++-shared/lib/amd64-Linux-g++/shared
+./debrunmuddy -h
+
 *)
 
 
