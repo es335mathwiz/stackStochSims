@@ -8,7 +8,7 @@ myCAssign::usage="use ToString to eliminate OutputForm ColumnForm"
 
 
 
-applyTemplates::usage="applyTemplates[modName_String,eqns_?VectorQ]"
+applyTemplates::usage="applyTemplates[eqns_?VectorQ,modName_String]"
 modelData::usage="associates data with model"
 modelExogenous::usage="associates data with model"
 modelFunctionName::usage="associates data with model"

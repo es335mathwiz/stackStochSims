@@ -1,7 +1,27 @@
-SetDirectory["~/git/stackStochSims"]
+(*
+cd ~;mkdir oneBelowHome;cd oneBelowHome
+to make sparseAMA stackC and stochSims code
+git clone https://github.com/es335mathwiz/sparseAMA.git
+git clone https://github.com/es335mathwiz/CStochSims.git
+cd sparseAMA
+if on msulx1 since java requests too much space for jvm use 
+export MAVEN_OPTS="-Xms64m -Xmx64m"
+mvn clean install
+cd ../CStochSims
+make -f makeStochTry debStochRun
+git clone https://github.com/es335mathwiz/stackStochSims.git
+git clone https://github.com/es335mathwiz/AccelerateAMA.git
+git clone https://github.com/es335mathwiz/ProtectedSymbols.git
+git clone https://github.com/es335mathwiz/mathAMA.git
+cd stackStochSims
+math  run version 10
+Get["fixSplice.m"]
+*)
 
 
-$toggleDirLoc=FileNameJoin[{Directory[],"/"},OperatingSystem->$OperatingSystem];
+
+
+$toggleDirLoc=FileNameJoin[{Directory[],"/"},OperatingSystem->$OperatingSystem]<>"/";
 $toGit=FileNameJoin[{Directory[],"../"},OperatingSystem->$OperatingSystem];
 Print["togit=",$toGit];
 $fmtPath=FileNameJoin[{$toGit,"paperProduction/FormatOptimize/"}];
@@ -26,7 +46,8 @@ $stackStochPath
 (*,$amaSer,$smolPath*)}];
 
 $toSoftware=FileNameJoin[{$toGit, "../softwareInstalls/"}];
-$reposLoc=FileNameJoin[{$toGit,"../.m2/repository"}]
+$reposLoc="/msu/home/m1gsa00/.m2/repository"
+
 (*Needs["AMAModel`"]Needs["AccelerateAMA`"]Needs["Stack`"]Needs["Stoch`"]*)
 
 Needs["JLink`"]
@@ -53,9 +74,11 @@ Get["toggleFile.m"]
 
 Get["rbcGenC.m"]
 
+
+applyTemplates[ rbcForC,"muddy"]
+
 (*
 
-applyTemplates["muddy", rbcForC]
 
 DeleteFile["mookey.c"]; Private`writeModelDotC["mookey", 
  Private`makeModelDotCAList[rbcForC]]
