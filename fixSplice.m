@@ -1,7 +1,14 @@
-SetDirectory["~/git/stackStochSims"]
+(*
+cd ~;mkdir oneBelowHome;cd oneBelowHom
+git clone https://github.com/es335mathwiz/stackStochSims.git
+git clone https://github.com/es335mathwiz/AccelerateAMA.git
+git clone https://github.com/es335mathwiz/ProtectedSymbols.git
+git clone https://github.com/es335mathwiz/mathAMA.git
+cd stackStochSims.git
+*)
 
 
-$toggleDirLoc=FileNameJoin[{Directory[],"/"},OperatingSystem->$OperatingSystem];
+$toggleDirLoc=FileNameJoin[{Directory[],"/"},OperatingSystem->$OperatingSystem]<>"/";
 $toGit=FileNameJoin[{Directory[],"../"},OperatingSystem->$OperatingSystem];
 Print["togit=",$toGit];
 $fmtPath=FileNameJoin[{$toGit,"paperProduction/FormatOptimize/"}];
@@ -26,7 +33,11 @@ $stackStochPath
 (*,$amaSer,$smolPath*)}];
 
 $toSoftware=FileNameJoin[{$toGit, "../softwareInstalls/"}];
-$reposLoc=FileNameJoin[{$toGit,"../.m2/repository"}]
+
+
+$reposLoc="/msu/home/m1gsa00/.m2/repository"
+
+
 (*Needs["AMAModel`"]Needs["AccelerateAMA`"]Needs["Stack`"]Needs["Stoch`"]*)
 
 Needs["JLink`"]
