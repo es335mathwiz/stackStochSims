@@ -8,7 +8,7 @@ myCAssign::usage="use ToString to eliminate OutputForm ColumnForm"
 
 
 
-applyTemplates::usage="applyTemplates[modName_String,eqns_?VectorQ]"
+applyTemplates::usage="applyTemplates[eqns_?VectorQ,modName_String]"
 modelData::usage="associates data with model"
 modelExogenous::usage="associates data with model"
 modelFunctionName::usage="associates data with model"
@@ -1101,6 +1101,8 @@ CFLAGS = -c  -fno-builtin-exit -fno-builtin-strcat -fno-builtin-strncat -fno-bui
 
 LINKFLAGS =   -v  -lc -ldl -lm -L../sparseAMA/target/nar/sparseAMA-1.0-SNAPSHOT-amd64-Linux-g++-shared/lib/amd64-Linux-g++/shared -lsparseAMA-1.0-SNAPSHOT $(CSTOCHSIMSDIR)stackC.o $(CSTOCHSIMSDIR)stochProto.o
 
+DEBLINKFLAGS =   -v  -lc -ldl -lm -L../sparseAMA/target/nar/sparseAMA-1.0-SNAPSHOT-amd64-Linux-g++-shared/lib/amd64-Linux-g++/shared -lsparseAMA-1.0-SNAPSHOT $(CSTOCHSIMSDIR)debStackC.o $(CSTOCHSIMSDIR)debStochProto.o
+
 .SUFFIXES:	.o .c .h
 
 
@@ -1161,7 +1163,7 @@ debrun`outFile`:	deb`outFile`.o debrun`outFile`.o \
 	deb`outFile`Drv.o deb`outFile`Support.o \
 	deb`outFile`Data.o deb`outFile`Shocks.o \
 	  $(RANLIBLOC) $(CSTOCHSIMSDIR)debMyNewt.o ../CStochSims/ma50ad.o\
-		-v  -lc -ldl -lm  $(LINKFLAGS) $(LAPACK) 
+		-v  -lc -ldl -lm  $(DEBLINKFLAGS) $(LAPACK) 
 		@echo \"to run requires runtime mod-> LD_LIBRARY_PATH=../sparseAMA/target/nar/sparseAMA-1.0-SNAPSHOT-amd64-Linux-g++-shared/lib/amd64-Linux-g++/shared:$(LD_LIBRARY_PATH)\"
 
 "
