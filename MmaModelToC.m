@@ -8,7 +8,7 @@ myCAssign::usage="use ToString to eliminate OutputForm ColumnForm"
 
 
 
-applyTemplates::usage="applyTemplates[eqns_?VectorQ,modName_String]"
+generateCCode::usage="generateCCode[eqns_?VectorQ,modName_String]"
 modelData::usage="associates data with model"
 modelExogenous::usage="associates data with model"
 modelFunctionName::usage="associates data with model"
@@ -411,15 +411,6 @@ Derivative[1,0][FMIN][x_,y_]:=(1-doRightSmaller[x,y])
 Derivative[0,1][FMIN][x_,y_]:=doRightSmaller[x,y]
 Derivative[1][FABS][x_]:=doSign[x]
 Protect[Derivative]
-(*
-define a sparse matrix data structure
-spMat[{val1,i1,j1},...{valn,in,jn}]
-sumSameJ={spMat[{x_,_,b_},z___,{y_,_,b_}]->spMat[{x+y,$allI,b},z]};
-sumSameI={spMat[{x_,a_,_},z___,{y_,a_,_}]->spMat[{x+y,a,$allJ},z]};
-adds entries with same columns
-SetAttributes[spMat,Orderless]
-
-*)
 
 sumSameIJ={spMat[zf___,{a_,b_,x_},zc___,{a_,b_,y_},zb___]:>spMat[zf,{a,b,x+y},zc,zb]};
 
@@ -504,178 +495,6 @@ With[{opVarDefs=genDefines[sfa]},
 
 
 
-doSplice[modelEquations_List,outFile_String]:= 
-Module[{outFileString,spaceForTempVars,functionName,stateVectorDefines,coeffDefines,exg,allv,
-	numberOfParameters,ll,modelCreationInfo,modelMatrix,forSeq,endg,notsmodelSparseDrvs,modelSparseDrvs,complexLinModel,linModel,nlinPartModel,
-	linModelMatrix,nlinModelMatrix,linModelSparseDrvs,nlinModelSparseDrvs,modelNumberOfEquations,numbExog,modelColumns,periodPointGuesserAssignments,
-	sparseFunctionAssignmentsA,sparseFunctionAssignmentsIA,sparseFunctionAssignmentsJA,
-	linSparseFunctionAssignmentsA,linSparseFunctionAssignmentsIA,linSparseFunctionAssignmentsJA,
-	nlinSparseFunctionAssignmentsA,nlinSparseFunctionAssignmentsIA,nlinSparseFunctionAssignmentsJA,
-	sparseFunctionDerivativeAssignmentsA,opVarDefsDrvSFA,
-sparseFunctionDerivativeAssignmentsIA,
-sparseFunctionDerivativeAssignmentsJA,linSparseFunctionDerivativeAssignmentsA,opLinVarDefsDrvSFA,
-linSparseFunctionDerivativeAssignmentsIA,
-linSparseFunctionDerivativeAssignmentsJA,
-nlinSparseFunctionDerivativeAssignmentsA,opNLinVarDefsDrvSFA,
-nlinSparseFunctionDerivativeAssignmentsIA,
-nlinSparseFunctionDerivativeAssignmentsJA,
-upsilonMatrix,upsilonMatA,upsilonMatIA,upsilonMatJA,
-exogHMatrix,exogHMatA,exogHMatIA,exogHMatJA,
-selectZMatrix,selectZMatA,selectZMatIA,selectZMatJA,
-defaultParams,numParams,fpGuessVec,dataRows,dataCols,valsInfo,shocksRows,shocksCols,dvalsInfo,dstr,lndeng,exogPos,exogQ},
-outFileString=ToString[outFile]; Print["spaceForTempVars probably not needed"];
-spaceForTempVars=spaceForTemp[modelEquations];
-Print["stateVectorDefines"]; 
-stateVectorDefines=StringJoin @@
-linearStateAssn[modelEquations]; Print["coeffDefines"];
-coeffDefines=StringJoin @@ coeffAssn[modelEquations];
-functionName=modelFunctionName[modelEquations];
-exg=modelExogenous[modelEquations]; endg=endog[modelEquations];
-allv=Union[exg,endg]; allcoeffs=coeffs[modelEquations];
-numberOfParameters=Length[coeffs[modelEquations]];
-ll=lagsLeads[modelEquations];
-modelCreationInfo=modelInfo[modelEquations]; Print["modelMatrix"];
-modelMatrix=denseColToSparseMat[Join[modelEquations(*/.funcSubs*),
-Table[0,{Length[modelExogenous[modelEquations]]}]]]//.timeSubs;
-forSeq= Sequence @@ ({#,ToExpression["linPt$" <>ToString[#]],1}&
-/@allVars[modelEquations]);(* Print[modelMatrix//InputForm];Print["linModel"];*)
-notsmodelSparseDrvs=spdrvs[modelEquations];
-modelSparseDrvs=notsmodelSparseDrvs//.timeSubs;
-complexLinModel=Join[(Print["starting
-series"];avoidSeries[modelEquations,notsmodelSparseDrvs])[[Range[Length[modelEquations]]]],Table[0,{Length[modelExogenous[modelEquations]]}]];
-linModel=Chop[Print["starting
-simplify"];complexLinModel/.reallyLinearSubs];
-(*linModel=Chop[Print["starting
-simplify"];Simplify[complexLinModel/.reallyLinearSubs]];*)
-(*Print["nlinPartModel"];Print["****",modelEquations,"****",linModel,"****"];*)
-nlinPartModel=Join[Chop[(*Print["starting simplify"];*)
-	modelEquations-(linModel[[Range[Length[modelEquations]]]])],
-Table[0,{Length[linModel]-Length[modelEquations]}]];(*Print["nlinpart",nlinPartModel];Print["?????",linModel[[2]],"?????",modelEquations[[2]],"????"];*)
-(*nlinPartModel=Join[Chop[Print["starting
-simplify"];Simplify[modelEquations-(linModel[[Range[Length[modelEquations]]]])]],
-Table[0,{Length[linModel]-Length[modelEquations]}]];Print["nlinpart",nlinPartModel];Print["?????",linModel[[2]],"?????",modelEquations[[2]],"????"];*)
-Print["computing linear part"];
-linModelMatrix=denseColToSparseMat[linModel]//.timeSubs;
-Print["computing non linear part"];
-nlinModelMatrix=denseColToSparseMat[nlinPartModel]//.timeSubs;
-Print["modelSparseDrvs"]; Print["differentiating linear part"];
-linModelSparseDrvs=forSplitSpdrvs[linModel[[Range[Length[modelEquations]]]],
-modelEquations]//.timeSubs; Print["differentiating non linear part"];
-nlinModelSparseDrvs=forSplitSpdrvs[nlinPartModel[[Range[Length[modelEquations]]]],modelEquations]//.timeSubs;
-modelNumberOfEquations=Length[Union[endg,modelExogenous[modelEquations]]];
-numbExog=Length[modelExogenous[modelEquations]];
-modelColumns=Abs[ll[[1]]]+ll[[-1]] +1;
-Print["periodicPointGuesserAssignments"];
-periodPointGuesserAssignments=
-myCAssign[guessVector[timeOffset],modelFpGuess[modelEquations],
-AssignToArray->{guessVector}]; 
-Print["sparseFunctionAssignments"];
-{sparseFunctionAssignmentsA,opVarDefsSFA,
-sparseFunctionAssignmentsIA,
-sparseFunctionAssignmentsJA}=
-genAIAJAAssn[modelEquations,modelMatrix];
-Print["linSparseFunctionAssignments"];(*lin part*)
-{linSparseFunctionAssignmentsA,opLinVarDefsSFA,
-linSparseFunctionAssignmentsIA,
-linSparseFunctionAssignmentsJA}=
-genAIAJAAssn[modelEquations,linModelMatrix];
-Print["nlinSparseFunctionAssignments"];(*nlpart*)
-{nlinSparseFunctionAssignmentsA,opNLinVarDefsSFA,
-nlinSparseFunctionAssignmentsIA,
-nlinSparseFunctionAssignmentsJA}=
-genAIAJAAssn[modelEquations,nlinModelMatrix];
-Print["sparseDerivativeAssignments"];
-{sparseFunctionDerivativeAssignmentsA,opVarDefsDrvSFA,
-sparseFunctionDerivativeAssignmentsIA,
-sparseFunctionDerivativeAssignmentsJA}=
-genAIAJAAssn[modelEquations,modelMatrix];
-Print["linSparseFunctionDerivativeAssignments"];(*lin part*)
-{linSparseFunctionDerivativeAssignmentsA,opLinVarDefsDrvSFA,
-linSparseFunctionDerivativeAssignmentsIA,
-linSparseFunctionDerivativeAssignmentsJA}=
-genAIAJAAssn[modelEquations,linModelMatrix];
-Print["nlinSparseFunctionDerivativeAssignments"];(*nlpart*)
-{nlinSparseFunctionDerivativeAssignmentsA,opNLinVarDefsDrvSFA,
-nlinSparseFunctionDerivativeAssignmentsIA,
-nlinSparseFunctionDerivativeAssignmentsJA}=
-genAIAJAAssn[modelEquations,nlinModelMatrix];
-Print["nlinSparseDerivativeAssignments"];
-bLength=Length[modelSparseDrvs[[1]]];
-upsilonMatrix=
-If[modelUpsilonEqns[modelEquations]=={},denseToSparseMat[{{1}}],
-refSpdrvs[
-Through[modelExogenous[modelEquations][t]]/.Flatten[Solve[Thread[modelUpsilonEqns[modelEquations]==0]
-,Through[modelExogenous[modelEquations][t]]]], modelEquations]];
-upsilonMatA=myCAssign[
-aMat,upsilonMatrix[[1]],AssignOptimize->True,OptimizationSymbol ->
-okay];
-upsilonMatIA= myCAssign[
-iaMat,upsilonMatrix[[3]],AssignOptimize->True,OptimizationSymbol ->
-okay];
-upsilonMatJA= myCAssign[
-jaMat,upsilonMatrix[[2]],AssignOptimize->True,OptimizationSymbol ->
-okay];
-exogHMatrix=
-If[modelUpsilonEqns[modelEquations]=={},denseToSparseMat[{{1}}],
-notSpdrvs[modelEquations]]//.timeSubs; exogHMatA=myCAssign[
-aMat,exogHMatrix[[1]],AssignOptimize->True,OptimizationSymbol -> okay]; exogHMatIA=
-myCAssign[ iaMat,exogHMatrix[[3]],AssignOptimize->True,OptimizationSymbol
--> okay];
-exogHMatJA= myCAssign[
-jaMat,exogHMatrix[[2]],AssignOptimize->True,OptimizationSymbol -> okay];
-selectZMatrix={Table[1,{numbExog}],
-Flatten[Position[bothExogEndog[modelEquations],#]& /@
-justExog[modelEquations]], Range[numbExog+1]}; selectZMatA=myCAssign[
-aMat,selectZMatrix[[1]],AssignOptimize->True,OptimizationSymbol ->
-okay];
-selectZMatIA= myCAssign[
-iaMat,selectZMatrix[[3]],AssignOptimize->True,OptimizationSymbol ->
-okay];
-selectZMatJA= myCAssign[
-jaMat,selectZMatrix[[2]],AssignOptimize->True,OptimizationSymbol ->
-okay];
-defaultParams=N[Flatten[
-modelDefaultParameters[modelEquations]]];
-numParams=Length[Flatten[
-modelDefaultParameters[modelEquations]]];
-fpGuessVec=modelFpGuess[modelEquations]; Print["data"];
-{dataRows,dataCols}=Dimensions[modelData[modelEquations]];(*Print[{dataRows,dataCols}];Print["huh",modelData[modelEquations]];*)
-vstr=StringReplace[ToString[InputForm[N[Flatten[modelData[modelEquations]]]]],{"*^-"->"e-"}];
-valsInfo=modelDataInfo[modelEquations]; Print["shocks"];
-{shocksRows,shocksCols}=Dimensions[modelShocks[modelEquations]];
-dvalsInfo=modelShocksInfo[modelEquations];
-dstr=StringReplace[ToString[InputForm[N[Flatten[modelShocks[modelEquations]]]]],{"*^-"->"e-"}];
-Print["splicing mmaToC.mc"];
-Splice[mmaMcFilesDir<>"/mmaToC.mc",outFile<>".c",
-PageWidth->Infinity(*Max[100000,(11/10)*Rows*dataCols]*)];
-Print["splicing mmaToCDrv.mc"];
-Splice[mmaMcFilesDir<>"/mmaToCDrv.mc",outFile<>"Drv.c",
-PageWidth->Infinity(*Max[100000,(11/10)*dataRows*dataCols]*)];
-Print["splicing mmaToCSupport.mc"];
-lngendg=bothExogEndog[modelEquations]; exg=justExog[modelEquations];
-exogPos=Flatten[Position[lngendg,#]& /@ exg];
-exogQ=Table[0,{Length[lngendg]}]; exogQ[[exogPos]]=1;
-Splice[mmaMcFilesDir<>"/mmaToCSupport.mc",outFile<>"Support.c",
-PageWidth->Infinity(*Max[100000,(11/10)*dataRows*dataCols]*)];
-Print["splicing mmaToCData.mc"];
-Splice[mmaMcFilesDir<>"/mmaToCData.mc",outFile<>"Data.c",
-PageWidth->Infinity(*Max[100000,(11/10)*dataRows*dataCols]*)];
-Print["splicing mmaToCShocks.mc"];
-Splice[mmaMcFilesDir<>"/mmaToCShocks.mc",outFile<>"Shocks.c",
-PageWidth->Infinity(*Max[100000,(11/10)*dataRows*dataCols]*)];
-Print["splicing runIt.mc"]; Splice[mmaMcFilesDir<>"/runIt.mc","run" <>
-outFile<>".c",PageWidth->Infinity];
-Print["splicing mpiRunIt.mc"];
-Splice[mmaMcFilesDir<>"/mpiRunIt.mc","mpirun" <>
-outFile<>".c",PageWidth->Infinity];
-Print["splicing makeFl.mc"];
-Splice[mmaMcFilesDir<>"/makeFl.mc","make"<>outFile,PageWidth->Infinity];
-Splice[mmaMcFilesDir<>"/runItLocalDefs.mc","run"<>outFile<>"LocalDefs.h",PageWidth->Infinity];
-Splice[mmaMcFilesDir<>"/mmaToCDataInclude.mc",outFile<>"DataForInclude.h",
-PageWidth->Infinity(*Max[100000,(11/10)*dataRows*dataCols]*)];
-Splice[mmaMcFilesDir<>"/mmaToCShockInclude.mc",outFile<>"ShocksForInclude.h",
-PageWidth->Infinity(*Max[100000,(11/10)*dataRows*dataCols]*)]; ];
-
 genDefines[theEqStr_String]:=
 With[{opVarNames=StringCases[theEqStr,
 RegularExpression["okay[0-9]+"]]},
@@ -694,24 +513,6 @@ With[{strSubs=
 strSubs]]
 
 
-doData[modelEquations_List,outFile_String]:=
-Module[{},
-functionName=modelFunctionName[modelEquations];
-outFileString=ToString[outFile];
-{dataRows,dataCols}=Dimensions[modelData[modelEquations]];;
-vstr=StringReplace[ToString[InputForm[N[Flatten[modelData[modelEquations]]]]],{"*^-"->"e-"}];
-valsInfo=modelDataInfo[modelEquations];
-{shocksRows,shocksCols}=Dimensions[modelShocks[modelEquations]];;
-dvalsInfo=modelShocksInfo[modelEquations];
-dstr=StringReplace[ToString[InputForm[N[Flatten[modelShocks[modelEquations]]]]],{"*^-"->"e-"}];
-Print["splicing mmaToCData.mc"];
-Splice[mmaMcFilesDir<>"/mmaToCData.mc",outFile<>"Data.c",
-	PageWidth->Infinity(*Max[100000,(11/10)*dataRows*dataCols]*)];
-Splice[mmaMcFilesDir<>"/mmaToCShockInclude.mc",outFile<>"ShocksForInclude.h",
-	PageWidth->Infinity(*Max[100000,(11/10)*dataRows*dataCols]*)];
-Splice[mmaMcFilesDir<>"/mmaToCDataInclude.mc",outFile<>"DataForInclude.h",
-	PageWidth->Infinity(*Max[100000,(11/10)*dataRows*dataCols]*)];
-];
 Print["done reading MmaModelToC.m"]
 (*
 
@@ -721,7 +522,7 @@ SetOptions[$Output,PageWidth -> Infinity]
 *)
 chkDelete[fName_String]:=If[FileExistsQ[fName],DeleteFile[fName]]
 
-applyTemplates[eqns_?VectorQ,modName_String]:=
+generateCCode[eqns_?VectorQ,modName_String]:=
 Module[{aList=makeModelDotCAList[eqns,modName]},
 chkDelete[modName<>".c"];writeModelDotC[modName,aList];
 chkDelete[modName<>"Drv.c"];writeModelDotCDrv[modName,aList];

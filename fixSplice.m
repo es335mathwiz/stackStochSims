@@ -43,6 +43,7 @@ $modPath=FileNameJoin[{$toGit,"mathAMA/AMAModel/"}];
 $proPath=FileNameJoin[{$toGit,"ProtectedSymbols/"}];
 $accPath=FileNameJoin[{$toGit,"AccelerateAMA/AccelerateAMA/"}];
 $stackStochPath=FileNameJoin[{$toGit,"stackStochSims/"}];
+
 $Path = 
 Join[$Path, 
 {
@@ -54,12 +55,12 @@ $proPath,
 $fmtPath,
 $stackStochPath
 (*,$amaSer,$smolPath*)}];
-
+(**)
 $toSoftware=FileNameJoin[{$toGit, "../softwareInstalls/"}];
 $reposLoc="/msu/home/m1gsa00/.m2/repository"
 
 
-(*Needs["AMAModel`"]Needs["AccelerateAMA`"]Needs["Stack`"]Needs["Stoch`"]*)
+
 
 Needs["JLink`"]
 InstallJava[];
@@ -71,37 +72,18 @@ AddToClassPath[FileNameJoin[{$reposLoc,"SAXON-HE/saxon9-xqj/9-7-0-2/saxon9-xqj-9
 AddToClassPath[FileNameJoin[{$reposLoc,"SAXON-HE/saxon9he/9-7-0-2/saxon9he-9-7-0-2.jar"}]];
 AddToClassPath[FileNameJoin[{$reposLoc,"xalan-j_2_7_1/xalan/2-7-1/xalan-2-7-1.jar"}]];
 
-Print[FileNameJoin[{$reposLoc,"xalan-j_2_7_1/xalan/2-7-1/xalan-2-7-1.jar"}]]
-Print["setup in stackStochSimsProj"]
 
 
 
 
-Get["MmaModelToC`"]
-
-
+(*takes mqxml file representing  rbc model creates an 
+AMAmodel and then parses that into a dynare model and creates 
+components needed  for c code generation*)
 Get["toggleFile.m"]
+
 
 
 Get["rbcGenC.m"]
 
 
-applyTemplates[ rbcForC,"muddy"]
 
-(*
-
-
-DeleteFile["mookey.c"]; Private`writeModelDotC["mookey", 
- Private`makeModelDotCAList[rbcForC]]
-
-
-DeleteFile["mookeyDrv.c"]; Private`writeModelDotCDrv["mookey", 
- Private`makeModelDotCAList[rbcForC]]
-
-DeleteFile["mookeyMakefile"]; Private`writeMakefile["mookey", 
- Private`makeModelDotCAList[rbcForC]]
-
-
-DeleteFile["mookeyCSupport"]; Private`writeCSupport["mookey", 
- Private`makeModelDotCAList[rbcForC]]
-*)
