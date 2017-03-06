@@ -266,7 +266,7 @@ forOne/@modelEquations]]]]
 
 
 
-(*this code differenctiates exog model equations but wrt
+(*this code differentiates exog model equations but wrt
 full vector so that sparse matrix has right column assignments*)
 refPrenewspdrv[exogEqns_List,modelEquations_List]:=
 With[{(*exg=modelExogenous[modelEquations]*)},
@@ -649,28 +649,28 @@ numberOfParameters=Length[coeffs[modelEquations]];
 {dataRows,dataCols}=Dimensions[modelData[modelEquations]];
 {shocksRows,shocksCols}=Dimensions[modelShocks[modelEquations]];
 {sparseFunctionAssignmentsA,opVarDefsSFA,
-sparseFunctionAssignmentsIA,
-sparseFunctionAssignmentsJA}=
+sparseFunctionAssignmentsJA,
+sparseFunctionAssignmentsIA}=
 genAIAJAAssn[modelEquations,modelMatrix];
 {linSparseFunctionAssignmentsA,opLinVarDefsSFA,
-linSparseFunctionAssignmentsIA,
-linSparseFunctionAssignmentsJA}=
+linSparseFunctionAssignmentsJA,
+linSparseFunctionAssignmentsIA}=
 genAIAJAAssn[modelEquations,linModelMatrix];
 {nlinSparseFunctionAssignmentsA,opNLinVarDefsSFA,
-nlinSparseFunctionAssignmentsIA,
-nlinSparseFunctionAssignmentsJA}=
+nlinSparseFunctionAssignmentsJA,
+nlinSparseFunctionAssignmentsIA}=
 genAIAJAAssn[modelEquations,nlinModelMatrix];
 {sparseFunctionDerivativeAssignmentsA,opVarDefsDrvSFA,
-sparseFunctionDerivativeAssignmentsIA,
-sparseFunctionDerivativeAssignmentsJA}=
-genAIAJAAssn[modelEquations,modelMatrix];
+sparseFunctionDerivativeAssignmentsJA,
+sparseFunctionDerivativeAssignmentsIA}=
+genAIAJAAssn[modelEquations,modelSparseDrvs];
 {linSparseFunctionDerivativeAssignmentsA,opLinVarDefsDrvSFA,
-linSparseFunctionDerivativeAssignmentsIA,
-linSparseFunctionDerivativeAssignmentsJA}=
+linSparseFunctionDerivativeAssignmentsJA,
+linSparseFunctionDerivativeAssignmentsIA}=
 genAIAJAAssn[modelEquations,linModelMatrix];
 {nlinSparseFunctionDerivativeAssignmentsA,opNLinVarDefsDrvSFA,
-nlinSparseFunctionDerivativeAssignmentsIA,
-nlinSparseFunctionDerivativeAssignmentsJA}=
+nlinSparseFunctionDerivativeAssignmentsJA,
+nlinSparseFunctionDerivativeAssignmentsIA}=
 genAIAJAAssn[modelEquations,nlinModelMatrix];
 ll=lagsLeads[modelEquations];
 lags=-ll[[1]];
@@ -1039,10 +1039,10 @@ for(i=0;i<numberOfShocks;i++){`functionName`Shocks(i,
 	`functionName`ShockVals+(i*numberOfEquations));}
 
 
-processCommandLine(argc,argv,namesArray,numberOfEquations,
+processCommandLine(argc,argv,namesArray,*numberOfEquations,
 paramNamesArray,numberOfParameters,parameters,
 	`functionName`DataVals,numberOfDataValues,
-	&pathLength,&replications,&t0,&stochasticPathLength,
+	pathLength,replications,t0,stochasticPathLength,
 intControlParameters,doubleControlParameters,flnm);
 
 
@@ -1692,10 +1692,10 @@ for(i=0;i<numDATA;i++){rbcExampleData(i,`functionName`DataVals+(i*numberOfEquati
 for(i=0;i<numSHOCKS;i++){rbcExampleShocks(i,`functionName`ShockVals+(i*numberOfEquations));}
 
 
-processCommandLine(argc,argv,namesArray,numberOfEquations,
+processCommandLine(argc,argv,namesArray,*numberOfEquations,
 paramNamesArray,numberOfParameters,parameters,
 	`functionName`DataVals,numDATA,numSHOCKS,
-	&pathLength,&replications,&t0,&stochasticPathLength,
+	pathLength,replications,t0,stochasticPathLength,
 intControlParameters,doubleControlParameters,flnm);
 
 /*

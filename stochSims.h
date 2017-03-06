@@ -130,5 +130,5 @@ void phrtsd(char* phrase,long* seed1,long* seed2);
 void setall(long iseed1,long iseed2);
 
 void generateDraws(int t0Index,int tfIndex,int replications,int shocksAvailable,
-int * iarray,char * str);
+int * iarray);
 

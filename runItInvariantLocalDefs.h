@@ -10,9 +10,17 @@ static char flnm[50] = "stochOut.m";
 /*a counter*/
 int i;int j;
 /*modelDimensions call determines these*/
-int  numberOfEquations;
-int  lags;
-int  leads;
+int  numberOfEquations[1]={rbcNEQS};
+int  lags[1]={rbcNLAGS};
+int  leads[1]={rbcNLEADS};
+int pathLength[1]={PATHLENGTH};
+int stochasticPathLength[1]={PATHLENGTH};
+int t0[1]={0};
+int tf[1]={0};
+int replications[1]={1};
+double totalTime[1];
+double userSystemTime[2];
+int shockIndex[1];
 int  numberOfParameters;
 int  numberOfDataValues;
 int  numberOfShocks;
@@ -30,20 +38,16 @@ int qRows=0;
  int aZero=0;
 
 /*processCommandLine() determines defaults for these*/
-int  replications;
-int  pathLength;
-int  stochasticPathLength;
-int  t0;
-int  tf;
+
 
 /*timing routine variables*/
-float  totalTime[1];
-float  userSystemTime[2];
+
+
 /*workspace*/
 double **fmats;int  **fmatsj;int  **fmatsi;
 double **smats;int  **smatsj;int  **smatsi;
 /*success indicators for stochSims*/
-int failedQ[1]={0};
+
 /*csr q matrix*/
 double * AMqMatrix;
 int * AMqMatrixj;

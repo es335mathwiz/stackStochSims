@@ -1,4 +1,6 @@
-
+#ifdef __APPLE__ && __MACH__
+#include<strings.h>
+#endif
 /* */
 
 void modData(int numberOfEquations,int numberDataValues,double * dataVals,
@@ -251,6 +253,9 @@ printf("i don't know the variable %s: ignoring this variable value pair\n",argv[
  }
 argc--;argv++;
 }
+
+
+printf("values for run:(pathLength=%d,replications=%d,t0=%d,stochasticPathLength=%d)\n",*pathLength,*replications,*t0,stochasticPathLength);
 
 
 }
