@@ -1,6 +1,9 @@
 #ifdef __APPLE__
 #include<strings.h>
 #endif
+#ifdef __linux__
+#include<string.h>
+#endif
 /* */
 
 void modData(int numberOfEquations,int numberDataValues,double * dataVals,
@@ -255,7 +258,7 @@ argc--;argv++;
 }
 
 
-printf("values for run:(pathLength=%d,replications=%d,t0=%d,stochasticPathLength=%d)\n",*pathLength,*replications,*t0,stochasticPathLength);
+printf("values for run:(pathLength=%d,replications=%d,t0=%d,stochasticPathLength=%d)\n",*pathLength,*replications,*t0,*stochasticPathLength);
 
 
 }
